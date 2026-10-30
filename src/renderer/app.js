@@ -398,6 +398,11 @@ function renderMap() {
   $('map-nav').textContent = current.name;
 }
 
+// O Rádio abre o iZurvive por cima da escolha salva: o seletor mostra o mapa que está na tela
+window.mapView.onChange((info) => {
+  mapInfo = info;
+  renderMap();
+});
 $('map-switch').addEventListener('click', async (e) => {
   const btn = e.target.closest('[data-map]');
   if (!btn || btn.dataset.map === mapInfo?.provider) return;

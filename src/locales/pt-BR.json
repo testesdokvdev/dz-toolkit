@@ -48,7 +48,7 @@
   "autorun.doing": "Correndo",
   "autorun.active": "Segurando Shift + W. Aperte {key} para parar.",
 
-  "clicker.desc": "Segura o botão direito e clica o esquerdo repetidamente enquanto o DayZ estiver em foco.",
+  "clicker.desc": "Segura o botão direito do mouse e dá cerca de 5 cliques por segundo com o esquerdo, só enquanto o DayZ estiver em foco.",
   "clicker.hotkeyHint": "Aperte no jogo para começar ou parar os cliques.",
   "clicker.step1": "Ligue os Cliques Automáticos na chave acima.",
   "clicker.step2": "No jogo, aperte a tecla de atalho para começar.",
@@ -195,7 +195,7 @@
   "radio.code": "Código da porta",
   "radio.coords": "X {x} · Z {z}",
   "radio.onmap": "Ver no mapa",
-  "radio.onmap.hint": "Abre o mapa na posição exata deste bunker",
+  "radio.onmap.hint": "Abre o iZurvive na posição exata deste bunker",
   "radio.badge.sure": "Confirmado, ouvido {n} vezes",
   "radio.badge.once": "Ouvido uma vez, aguarde a repetição",
   "radio.badge.part": "Ouvido em parte, aguarde a repetição",
@@ -241,7 +241,7 @@
   "whatsnew.open": "Ver as novidades desta versão",
 
   "notice.title": "Antes de usar",
-  "notice.p1": "O DayZ Toolkit envia teclas e cliques automáticos ao DayZ (Auto Run e Cliques Automáticos).",
+  "notice.p1": "O DZ Toolkit envia ao DayZ teclas e cliques do mouse como se fossem seus: Shift + W segurado (Auto Run) e o botão direito segurado com cliques repetidos do esquerdo (Cliques Automáticos).",
   "notice.p2.html": "Muitos servidores proíbem macros e qualquer automação de jogo, e a punição vale mesmo que o BattlEye não bloqueie. <strong>Confira as regras do seu servidor antes de ligar qualquer ferramenta.</strong>",
   "notice.p3": "Use por sua conta e risco. O app não altera nem lê a memória do jogo.",
   "notice.ok": "Entendi",

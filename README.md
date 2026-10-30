@@ -1,4 +1,4 @@
-# DayZ Toolkit
+# DZ Toolkit
 
 Ferramentas para DayZ em um app só: **Auto Run**, **Cliques Automáticos** e **Monitor de Servidor**.
 Feito em Electron; teclado, mouse e janelas usam a API do Windows direto (via `koffi`).
@@ -9,10 +9,10 @@ Código aberto sob a licença [MIT](LICENSE).
 | Ferramenta | O que faz |
 |---|---|
 | Auto Run | Segura Shift + W enquanto ativo e o DayZ estiver em foco |
-| Cliques Automáticos | Segura o botão direito e clica o esquerdo repetidamente, só com o DayZ em foco |
+| Cliques Automáticos | Segura o botão direito do mouse e dá cerca de 5 cliques por segundo com o esquerdo, só com o DayZ em foco. É exatamente isso e mais nada: não mira, não detecta nada na tela e não lê o jogo |
 | Monitor de Servidor | Quando o servidor cai, você não precisa ficar atualizando o DayZ Launcher: o app consulta o servidor (Steam A2S, UDP) e avisa com som e alerta na tela quando ele voltar. O "Status ao vivo" mostra a hora do jogo, a fila, os jogadores, o ping e se a versão do seu jogo bate com a do servidor |
 | Relógio na tela | Mostra a hora do jogo, exatamente como o servidor informa, num canto da tela, por cima do DayZ em janela ou janela sem bordas. Não pega clique nem foco |
-| Rádio Nasdara | Só para o mapa Nasdara (Badlands): escuta só o som do DayZ, decodifica o morse do rádio dos bunkers (80.0 MHz, de noite) e mostra a grade do mapa e o código da porta de cada bunker. Mostra ao vivo os bipes que está ouvindo e os dígitos que decifrou, avisa na tela quando um bunker é confirmado e abre a posição dele no mapa escolhido (iZurvive ou Nasdara Map) com um clique |
+| Rádio Nasdara | Só para o mapa Nasdara (Badlands): escuta só o som do DayZ, decodifica o morse do rádio dos bunkers (80.0 MHz, de noite) e mostra a grade do mapa e o código da porta de cada bunker. Mostra ao vivo os bipes que está ouvindo e os dígitos que decifrou, avisa na tela quando um bunker é confirmado e abre a posição dele no iZurvive com um clique (sempre o iZurvive, que é de onde vêm as coordenadas, mesmo que a aba Mapa esteja no Nasdara Map) |
 | Mapa | Mapas interativos dentro do app, com as marcações do próprio mapa: [iZurvive](https://www.izurvive.com/) ou [Nasdara Map](https://nasdaramap.com/), à sua escolha (um seletor na própria aba; a escolha fica salva) |
 
 - **Não grava o que você digita.** Os atalhos são atalhos globais do Windows (`RegisterHotKey`): o app só é avisado
@@ -79,27 +79,42 @@ npm run icon       # regenera src/assets/icon.png
 5. Dê o `git push` dos commits (a tag da Release nasce do que já está no GitHub) e rode `npm run release` (usa o
    login do `gh`). Ele pede confirmação e publica a Release em `testesdokvdev/dayz-toolkit` (o repositório de
    `build.publish`, no `package.json`) com **uma chamada só** do `gh`: instalador, `.blockmap`, `latest.yml` e
-   `SHA256SUMS.txt`. É isso que os apps instalados leem para se atualizar sozinhos: não há mais Drive nem site a
-   atualizar a cada versão.
+   `SHA256SUMS.txt` (os nomes são `DZ-Toolkit-Setup-X.Y.Z.exe`, iguais aos do `latest.yml`). É isso que os apps
+   instalados leem para se atualizar sozinhos: não há mais Drive nem site a atualizar a cada versão. Os assets
+   públicos são só os `DZ-Toolkit-*`.
+6. Só enquanto existirem versões 2.5.0 ou anteriores: envie ao Drive que o `/baixar` aponta a **cópia ponte**
+   `dist/DayZ-Toolkit-Setup-X.Y.Z.exe` (veja abaixo). Ela não vai para a Release.
 
 Boas práticas: publique poucas versões e espaçadas, não envie várias seguidas.
 
 ### Versões antigas (2.5.0 e anteriores)
 
-Elas não têm o atualizador novo: só olham a página `dayz-toolkit.netlify.app/baixar`, que hoje redireciona (302) para um
-arquivo do Google Drive, e leem a versão no nome do instalador (`DayZ-Toolkit-Setup-X.Y.Z.exe`). Para elas migrarem,
-**uma vez**, na primeira Release com atualização automática, faça uma destas duas coisas:
+Elas não têm o atualizador novo: só olham a página `dayz-toolkit.netlify.app/baixar`, que redireciona (302) para um
+arquivo do Google Drive, e só reconhecem versão nova pelo **nome** desse arquivo, que tem de casar com
+`DayZ-Toolkit-Setup-X.Y.Z.exe`. O instalador novo se chama `DZ-Toolkit-Setup-X.Y.Z.exe` (nome que o regex antigo não
+reconhece), então **não aponte o `/baixar` para o asset do GitHub**: as versões antigas nunca ficariam sabendo da versão nova.
 
-- Apontar o `/baixar` do site (redirect do Netlify) para o instalador dessa Release no GitHub, por exemplo
-  `https://github.com/testesdokvdev/dayz-toolkit/releases/download/vX.Y.Z/DayZ-Toolkit-Setup-X.Y.Z.exe`. O app antigo
-  segue o redirect, lê o nome do arquivo no cabeçalho `content-disposition` (o GitHub o envia como
-  `attachment; filename=DayZ-Toolkit-Setup-X.Y.Z.exe`) e passa a oferecer a versão nova; o botão "Baixar nova versão"
-  abre o `/baixar` no navegador, que redireciona para o arquivo (download direto, sem o aviso de vírus do Drive).
-  Isso foi conferido só com um asset de outro repositório público: o do `testesdokvdev` ainda não tem Release.
-- Ou enviar esse instalador ao Drive que o `/baixar` aponta, como antes.
+Para elas migrarem existe a **cópia ponte**: `npm run dist` e `npm run release` (inclusive com `--dry-run`) geram, além do
+instalador, `dist/DayZ-Toolkit-Setup-X.Y.Z.exe`, uma cópia byte a byte do `DZ-Toolkit-Setup-X.Y.Z.exe` (mesmo SHA256, o
+script confere). **Cópia ponte para o Drive, só enquanto existirem versões 2.5.0 ou anteriores.** Ela não sobe na Release do
+GitHub. Passo a passo: envie essa cópia ao Drive que o `/baixar` aponta (substituindo o arquivo antigo); os apps antigos
+leem a versão no nome, avisam, e o botão "Baixar nova versão" abre o `/baixar`. Cada pessoa instala essa versão na mão
+uma vez (o instalador novo substitui a instalação antiga, sem deixar dois apps); dali em diante a atualização é
+automática, pelo GitHub. Quando não houver mais ninguém nas versões antigas, ponha `BRIDGE_ENABLED = false` em
+`scripts/bridge.js` (ou apague o arquivo e as duas chamadas).
 
-Cada pessoa instala essa versão na mão uma vez; dali em diante a atualização é automática. Depois disso o `/baixar` pode
-continuar apontando para a Release mais recente (trocando o link a cada versão) ou ficar como está.
+### Nome do app, pasta de dados e instalação
+
+O app se chamava DayZ Toolkit e agora é **DZ Toolkit** (só o nome do produto; o `appId` continua o mesmo, por isso o
+Windows trata o instalador novo como atualização do antigo e atualiza o item em Configurações > Aplicativos em vez de criar
+outro). Testado com instaladores de teste de mesmo `appId`: a instalação nova cai na **mesma pasta** da antiga (que mantém o
+nome antigo, ex.: `%LOCALAPPDATA%ProgramsDayZ ToolkitDZ Toolkit.exe`), o `DayZ Toolkit.exe` e o desinstalador antigo somem, os
+atalhos do Menu Iniciar e da Área de Trabalho são trocados pelos novos e o app aberto é fechado. **Atenção:** um ícone fixado na
+barra de tarefas, ou um atalho feito à mão que aponte para o `DayZ Toolkit.exe`, deixa de funcionar (o executável mudou de nome)
+e precisa ser fixado de novo. A pasta de dados do Electron vem do nome do produto, então sem cuidado ela mudaria e quem já usa
+perderia as preferências e as marcações dos mapas: por isso `src/main/datadir.js` continua usando `%APPDATA%\DayZ Toolkit` quando
+ela já existe (instalações novas usam `%APPDATA%\DZ Toolkit`). Nela ficam o `settings.json` e os perfis dos mapas
+(`persist:izurvive` e `persist:nasdaramap`).
 
 ### Assinatura do instalador (recomendado)
 
@@ -127,7 +142,9 @@ autoridade reconhecida e mantenha o mesmo publicador em todas as versões seguin
 Os mapas da aba **Mapa** são o [iZurvive](https://www.izurvive.com/) (https://www.izurvive.com/) e o
 [Nasdara Map](https://nasdaramap.com/) (https://nasdaramap.com/), carregados de lá dentro do app. Todo o mapa, os
 dados e as marcações pertencem aos seus criadores; este projeto não é afiliado ao iZurvive, ao Nasdara Map nem ao
-DayZ (Bohemia Interactive), e o crédito do mapa em uso aparece também na própria aba. O Nasdara Map se descreve como
+DayZ (Bohemia Interactive), e o crédito do mapa em uso aparece também na própria aba. DayZ é marca da Bohemia
+Interactive; o nome só aparece aqui para dizer com que jogo o app funciona (uso nominativo), e o DZ Toolkit é um projeto
+independente e não oficial. O Nasdara Map se descreve como
 projeto não oficial de fãs, gratuito, e não publica termos de uso (só uma política de privacidade).
 
 ## Idiomas
@@ -148,6 +165,7 @@ src/main/      processo principal
   win32.js       API do Windows (janelas, foco, SendInput)
   a2s.js         consulta Steam A2S do monitor de servidor
   updater.js     atualização automática pelas Releases do GitHub (electron-updater)
+  datadir.js     pasta de dados (mantém %APPDATA%\DayZ Toolkit de quem já usa, apesar do nome novo)
   settings.js    preferências salvas
   i18n.js        idiomas (carrega src/locales e traduz os avisos)
   toast.js       aviso flutuante no canto da tela

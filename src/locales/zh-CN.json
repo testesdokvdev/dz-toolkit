@@ -48,7 +48,7 @@
   "autorun.doing": "奔跑中",
   "autorun.active": "正在按住 Shift + W。按 {key} 停止。",
 
-  "clicker.desc": "DayZ 在前台时，按住鼠标右键并不断点击左键。",
+  "clicker.desc": "仅在 DayZ 位于前台时，按住鼠标右键，并以每秒约 5 次的频率点击左键。",
   "clicker.hotkeyHint": "在游戏中按下它即可开始或停止点击。",
   "clicker.step1": "用上方的开关打开自动点击。",
   "clicker.step2": "在游戏中按下快捷键开始。",
@@ -195,7 +195,7 @@
   "radio.code": "门锁密码",
   "radio.coords": "X {x} · Z {z}",
   "radio.onmap": "在地图上查看",
-  "radio.onmap.hint": "在地图中打开此地堡的确切位置",
+  "radio.onmap.hint": "在 iZurvive 中打开此地堡的确切位置",
   "radio.badge.sure": "已确认，听到 {n} 次",
   "radio.badge.once": "只听到一次，请等待重复",
   "radio.badge.part": "只听到一部分，请等待重复",
@@ -241,7 +241,7 @@
   "whatsnew.open": "查看此版本的新功能",
 
   "notice.title": "使用前请注意",
-  "notice.p1": "DayZ Toolkit 会向 DayZ 发送自动按键和点击（自动奔跑和自动点击）。",
+  "notice.p1": "DZ Toolkit 会像你本人操作一样向 DayZ 发送按键和鼠标点击：按住 Shift + W（自动奔跑），以及按住鼠标右键并重复点击左键（自动点击）。",
   "notice.p2.html": "许多服务器禁止使用宏和任何形式的游戏自动化，即使 BattlEye 没有拦截，也会受到处罚。<strong>开启任何工具之前，请先查看服务器的规则。</strong>",
   "notice.p3": "风险自负。本应用不会修改或读取游戏内存。",
   "notice.ok": "我知道了",

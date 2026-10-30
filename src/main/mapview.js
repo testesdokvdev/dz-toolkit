@@ -7,7 +7,7 @@
 
 const { WebContentsView, shell, session } = require('electron');
 
-// Zoom ao ir para um ponto: o suficiente para ver o bunker e as ruas em volta
+// Zoom ao ir para um ponto do Radio: o suficiente para ver o bunker e as ruas em volta
 const POINT_ZOOM = 7;
 
 const PROVIDERS = {
@@ -16,8 +16,6 @@ const PROVIDERS = {
     site: 'izurvive.com',
     home: 'https://www.izurvive.com/',
     partition: 'persist:izurvive',
-    // Mapa da Nasdara (Badlands) centrado em x (leste) e z (norte), em metros do jogo
-    point: (x, z) => `https://www.izurvive.com/nasdara/#location=${x};${z};${POINT_ZOOM}`,
   },
   nasdara: {
     name: 'Nasdara Map',
@@ -25,11 +23,14 @@ const PROVIDERS = {
     // Direto no mapa: a pagina inicial do site e uma vitrine que oferece o APK para baixar
     home: 'https://nasdaramap.com/map',
     partition: 'persist:nasdaramap',
-    // Mesmo formato que o proprio site grava no endereco: #mapa/leste/norte/zoom. Sem o marcador (/nome): com ele a pagina do site trava
-    point: (x, z) => `https://nasdaramap.com/map#nasdara/${Math.round(x)}/${Math.round(z)}/${POINT_ZOOM}`,
   },
 };
 const DEFAULT_PROVIDER = 'izurvive';
+
+// "Ver no mapa" do Radio: as coordenadas dos bunkers sao do iZurvive, entao vai sempre para ele (Nasdara, centrado em
+// x = leste e z = norte, em metros do jogo), qualquer que seja o mapa escolhido no seletor
+const POINT_PROVIDER = 'izurvive';
+const pointUrl = (x, z) => `https://www.izurvive.com/nasdara/#location=${x};${z};${POINT_ZOOM}`;
 
 function isOwn(provider, url) {
   try {
@@ -41,9 +42,12 @@ function isOwn(provider, url) {
 }
 
 class MapView {
-  constructor(win, settings) {
+  /** onChange(info): avisa a interface quando o mapa mostrado muda sem o usuario mexer no seletor (Ver no mapa) */
+  constructor(win, settings, onChange = () => {}) {
     this.win = win;
     this.settings = settings;
+    this.onChange = onChange;
+    this.override = null; // mapa mostrado so por ora (Ver no mapa); a escolha salva do seletor nao muda
     this.views = {}; // id do mapa -> view; so nasce quando aquele mapa e mostrado pela primeira vez
     this.pending = {}; // id do mapa -> endereco pedido antes de a view existir
     this.rect = null; // ultima posicao pedida pela interface
@@ -52,6 +56,7 @@ class MapView {
   }
 
   get id() {
+    if (this.override) return this.override;
     const saved = this.settings.data.app.mapProvider;
     return PROVIDERS[saved] ? saved : DEFAULT_PROVIDER;
   }
@@ -66,6 +71,7 @@ class MapView {
 
   setProvider(id) {
     if (PROVIDERS[id]) {
+      this.override = null;
       this.settings.data.app.mapProvider = id;
       this.settings.save();
       this._layout();
@@ -88,8 +94,8 @@ class MapView {
       webPreferences: { session: ses, sandbox: true, contextIsolation: true, nodeIntegration: false },
     });
     const wc = view.webContents;
-    // Alguns sites estranham o "Electron" no identificador do navegador
-    wc.setUserAgent(wc.getUserAgent().replace(/\s(?:Electron|dayz-toolkit)\/\S+/gi, ''));
+    // Alguns sites estranham o "Electron" (e o nome do app, ex.: DZToolkit/2.5.0) no identificador do navegador
+    wc.setUserAgent(wc.getUserAgent().replace(/\s(?:Electron|\S*toolkit)\/\S+/gi, ''));
 
     const external = (url) => {
       if (/^https:\/\//.test(url)) shell.openExternal(url);
@@ -135,10 +141,16 @@ class MapView {
     this._layout();
   }
 
-  /** Abre o mapa escolhido centrado em x (leste) e z (norte), em metros do jogo */
+  /** Abre o iZurvive centrado em x (leste) e z (norte), em metros do jogo */
   goTo(x, z) {
-    const id = this.id;
-    const url = PROVIDERS[id].point(x, z);
+    const id = POINT_PROVIDER;
+    if (this.id !== id) {
+      // O seletor guarda a escolha do usuario; aqui o iZurvive so entra no lugar enquanto nao houver nova escolha
+      this.override = id;
+      this._layout();
+      this.onChange(this.info());
+    }
+    const url = pointUrl(x, z);
     const view = this.views[id];
     if (!view) {
       // Ainda nao abriu: a view e criada ja com o tamanho certo quando a pagina do mapa aparecer, e carrega neste ponto

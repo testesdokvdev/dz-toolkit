@@ -48,7 +48,7 @@
   "autorun.doing": "Running",
   "autorun.active": "Holding Shift + W. Press {key} to stop.",
 
-  "clicker.desc": "Holds the right button and clicks the left one repeatedly while DayZ is in focus.",
+  "clicker.desc": "Holds the right mouse button and clicks the left one about 5 times a second, only while DayZ is in focus.",
   "clicker.hotkeyHint": "Press it in the game to start or stop the clicks.",
   "clicker.step1": "Turn on Auto Clicker with the switch above.",
   "clicker.step2": "In the game, press the hotkey to start.",
@@ -195,7 +195,7 @@
   "radio.code": "Door code",
   "radio.coords": "X {x} · Z {z}",
   "radio.onmap": "Show on map",
-  "radio.onmap.hint": "Opens the map at this bunker’s exact position",
+  "radio.onmap.hint": "Opens iZurvive at this bunker’s exact position",
   "radio.badge.sure": "Confirmed, heard {n} times",
   "radio.badge.once": "Heard once, wait for the repeat",
   "radio.badge.part": "Heard in part, wait for the repeat",
@@ -241,7 +241,7 @@
   "whatsnew.open": "See what's new in this version",
 
   "notice.title": "Before you use it",
-  "notice.p1": "DayZ Toolkit sends automatic key presses and clicks to DayZ (Auto Run and Auto Clicker).",
+  "notice.p1": "DZ Toolkit sends key presses and mouse clicks to DayZ as if they were yours: Shift + W held down (Auto Run) and the right button held down with repeated left clicks (Auto Clicker).",
   "notice.p2.html": "Many servers ban macros and any kind of game automation, and the punishment applies even if BattlEye does not block it. <strong>Check your server's rules before turning on any tool.</strong>",
   "notice.p3": "Use at your own risk. The app does not change or read the game's memory.",
   "notice.ok": "Got it",

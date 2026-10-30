@@ -1,13 +1,17 @@
 {
-  "version": "2.5.0",
+  "version": "2.6.0",
   "notes": {
     "pt-BR": [
+      "Atualização automática: quando sai versão nova, o aviso ganha o botão Atualizar. O app baixa sozinho, com barra de progresso, instala em silêncio e reabre já atualizado, sem você rodar instalador. Nada baixa antes do seu clique",
       "Rádio Nasdara: decodificação ao vivo agora em linha única (corrige coluna gigante e bipes vazando)",
-      "Aba Mapa: novo seletor para escolher entre o iZurvive e o Nasdara Map (nasdaramap.com). O app lembra a escolha, o crédito e o link mudam junto, e o botão \"Ver no mapa\" do Rádio Nasdara abre o mapa que estiver escolhido"
+      "Aba Mapa: novo seletor para escolher entre o iZurvive e o Nasdara Map (nasdaramap.com). O app lembra a escolha, o crédito e o link mudam junto, e o botão \"Ver no mapa\" do Rádio Nasdara continua abrindo sempre o iZurvive, de onde vêm as coordenadas",
+      "O app agora se chama DZ Toolkit. Suas preferências e as marcações dos mapas continuam como estavam, e o instalador novo atualiza a instalação antiga (sem ficar com dois apps). Se você tinha o app fixado na barra de tarefas, fixe de novo"
     ],
     "en": [
+      "Automatic updates: when a new version is out, the notice gets an Update button. The app downloads it by itself with a progress bar, installs silently and reopens already updated, with no installer to run. Nothing downloads before you click",
       "Nasdara radio: live decoding is now a single line (fixes the giant column and the beeps spilling out)",
-      "Map tab: new selector to choose between iZurvive and Nasdara Map (nasdaramap.com). The app remembers your choice, the credit and link change with it, and the Nasdara radio’s “Show on map” button opens whichever map is selected"
+      "Map tab: new selector to choose between iZurvive and Nasdara Map (nasdaramap.com). The app remembers your choice, the credit and link change with it, and the Nasdara radio’s “Show on map” button still always opens iZurvive, where the coordinates come from",
+      "The app is now called DZ Toolkit. Your settings and map markers stay as they were, and the new installer updates the old install (no two apps side by side). If you had the app pinned to the taskbar, pin it again"
     ]
   }
 }

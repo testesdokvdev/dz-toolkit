@@ -48,7 +48,7 @@
   "autorun.doing": "Course en cours",
   "autorun.active": "Shift + W maintenu. Appuyez sur {key} pour arrêter.",
 
-  "clicker.desc": "Maintient le bouton droit et clique avec le gauche à répétition tant que DayZ est au premier plan.",
+  "clicker.desc": "Maintient le bouton droit de la souris enfoncé et clique avec le gauche environ 5 fois par seconde, seulement tant que DayZ est au premier plan.",
   "clicker.hotkeyHint": "Appuyez dessus dans le jeu pour démarrer ou arrêter les clics.",
   "clicker.step1": "Activez les clics automatiques avec l'interrupteur ci-dessus.",
   "clicker.step2": "Dans le jeu, appuyez sur le raccourci pour démarrer.",
@@ -195,7 +195,7 @@
   "radio.code": "Code de la porte",
   "radio.coords": "X {x} · Z {z}",
   "radio.onmap": "Voir sur la carte",
-  "radio.onmap.hint": "Ouvre la carte à la position exacte de ce bunker",
+  "radio.onmap.hint": "Ouvre iZurvive à la position exacte de ce bunker",
   "radio.badge.sure": "Confirmé, entendu {n} fois",
   "radio.badge.once": "Entendu une fois, attendez la répétition",
   "radio.badge.part": "Entendu en partie, attendez la répétition",
@@ -241,7 +241,7 @@
   "whatsnew.open": "Voir les nouveautés de cette version",
 
   "notice.title": "Avant d'utiliser",
-  "notice.p1": "DayZ Toolkit envoie des touches et des clics automatiques à DayZ (course automatique et clics automatiques).",
+  "notice.p1": "DZ Toolkit envoie à DayZ des touches et des clics de souris comme si c'étaient les vôtres : Maj + W maintenu (course automatique) et bouton droit maintenu avec des clics répétés du gauche (clics automatiques).",
   "notice.p2.html": "Beaucoup de serveurs interdisent les macros et toute automatisation du jeu, et la sanction s'applique même si BattlEye ne la bloque pas. <strong>Vérifiez les règles de votre serveur avant d'activer un outil.</strong>",
   "notice.p3": "Utilisation à vos risques et périls. L'app ne modifie ni ne lit la mémoire du jeu.",
   "notice.ok": "Compris",

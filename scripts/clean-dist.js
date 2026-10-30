@@ -10,7 +10,7 @@ function cleanDist() {
   try {
     fs.rmSync(dist, { recursive: true, force: true });
   } catch (err) {
-    console.error(`Nao consegui limpar dist/ (${err.code}). Feche o DayZ Toolkit se ele estiver aberto a partir de dist/ e tente de novo.`);
+    console.error(`Nao consegui limpar dist/ (${err.code}). Feche o DZ Toolkit se ele estiver aberto a partir de dist/ e tente de novo.`);
     process.exit(1);
   }
 }

@@ -43,6 +43,7 @@ contextBridge.exposeInMainWorld('whatsNew', {
 contextBridge.exposeInMainWorld('mapView', {
   get: () => ipcRenderer.invoke('map:get'),
   set: (id) => ipcRenderer.invoke('map:set', id),
+  onChange: subscribe('map:changed'),
   setBounds: (bounds) => ipcRenderer.send('map:bounds', bounds),
   reload: () => ipcRenderer.send('map:reload'),
   home: () => ipcRenderer.send('map:home'),

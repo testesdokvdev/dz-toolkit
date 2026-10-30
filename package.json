@@ -1,7 +1,7 @@
 {
   "name": "dayz-toolkit",
-  "productName": "DayZ Toolkit",
-  "version": "2.5.0",
+  "productName": "DZ Toolkit",
+  "version": "2.6.0",
   "description": "Auto Run, Cliques Automáticos e Monitor de Servidor para DayZ",
   "author": "Kevin Morente",
   "license": "MIT",
@@ -23,14 +23,14 @@
   "scripts": {
     "start": "node scripts/start.js",
     "icon": "node scripts/start.js scripts/make-icon.js",
-    "dist": "node scripts/changelog.js && node scripts/clean-dist.js && electron-builder --win",
+    "dist": "node scripts/changelog.js && node scripts/clean-dist.js && electron-builder --win && node scripts/bridge.js",
     "bump": "node scripts/bump.js",
     "release": "node scripts/release.js",
     "virustotal": "node scripts/virustotal.js"
   },
   "build": {
     "appId": "br.com.kevinmorente.dayztoolkit",
-    "productName": "DayZ Toolkit",
+    "productName": "DZ Toolkit",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -62,8 +62,8 @@
       "language": "1046",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "DayZ Toolkit",
-      "artifactName": "DayZ-Toolkit-Setup-${version}.${ext}",
+      "shortcutName": "DZ Toolkit",
+      "artifactName": "DZ-Toolkit-Setup-${version}.${ext}",
       "installerLanguages": [
         "pt_BR"
       ]

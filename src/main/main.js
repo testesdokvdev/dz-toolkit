@@ -11,6 +11,7 @@ const { WhatsNew } = require('./whatsnew');
 const { Overlay } = require('./overlay');
 const { MapView } = require('./mapview');
 const { AppAudio } = require('./appaudio');
+const { pinUserDataDir } = require('./datadir');
 
 const TOAST_KIND = { success: 'success', danger: 'danger', info: 'info' };
 
@@ -22,6 +23,9 @@ const TOOLKIT_METHODS = new Set([
   'setServerConfig', 'startServerMonitor', 'stopServerMonitor',
   'startStatusTracker', 'stopStatusTracker', 'setOverlayConfig',
 ]);
+
+// Antes de tudo que usa a pasta de dados (a trava de instancia unica ja usa): o app mudou de nome, a pasta nao
+pinUserDataDir(app);
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -49,7 +53,7 @@ if (!app.requestSingleInstanceLock()) {
       minWidth: 920,
       minHeight: 620,
       backgroundColor: '#0b0d12',
-      title: 'DayZ Toolkit',
+      title: 'DZ Toolkit',
       icon: path.join(__dirname, '..', 'assets', 'icon.png'),
       titleBarStyle: 'hidden',
       titleBarOverlay: { color: '#0b0d12', symbolColor: '#8b95a7', height: 38 },
@@ -168,7 +172,7 @@ if (!app.requestSingleInstanceLock()) {
     });
 
     createWindow();
-    mapView = new MapView(win, settings);
+    mapView = new MapView(win, settings, (info) => send('map:changed', info));
     win.on('focus', () => {
       win.flashFrame(false);
       overlay.setFocused(true);

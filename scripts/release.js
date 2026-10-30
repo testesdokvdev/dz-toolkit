@@ -19,6 +19,7 @@ const path = require('path');
 const readline = require('readline');
 const { cleanDist } = require('./clean-dist');
 const changelog = require('./changelog');
+const { makeBridgeCopy } = require('./bridge');
 
 const root = path.join(__dirname, '..');
 const dist = path.join(root, 'dist');
@@ -26,7 +27,7 @@ const dryRun = process.argv.includes('--dry-run');
 const pkg = require(path.join(root, 'package.json'));
 const { version } = pkg;
 const tag = `v${version}`;
-const installer = `DayZ-Toolkit-Setup-${version}.exe`;
+const installer = `DZ-Toolkit-Setup-${version}.exe`;
 const feed = pkg.build.publish.find((p) => p.provider === 'github');
 const repo = `${feed.owner}/${feed.repo}`;
 // O app abre "repository"/releases/latest como plano B do download manual (a chave "build" nao vai no app empacotado)
@@ -130,6 +131,14 @@ async function main() {
   const sums = path.join(dist, 'SHA256SUMS.txt');
   fs.writeFileSync(sums, `${hash}  ${installerName}\n`);
   console.log(`\nSHA256: ${hash}`);
+
+  // Copia ponte (nome antigo, mesmo SHA256) para o Drive das versoes <= 2.5.0. Fica FORA da lista de assets da Release.
+  try {
+    const bridge = makeBridgeCopy(version);
+    if (bridge) console.log(`Copia ponte para o Drive: ${path.basename(bridge.file)} (mesmo SHA256; NAO vai para a Release do GitHub).`);
+  } catch (error) {
+    fail(error.message);
+  }
 
   await maybeVirusTotal(files[0]);
 

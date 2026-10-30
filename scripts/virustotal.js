@@ -4,7 +4,7 @@
 // Tambem e chamado pelo scripts/release.js, que pergunta se voce quer rodar apos gerar o build.
 //
 //   $env:VT_API_KEY = "sua_chave"       (PowerShell)
-//   npm run virustotal                 usa dist/DayZ-Toolkit-Setup-<versao>.exe
+//   npm run virustotal                 usa dist/DZ-Toolkit-Setup-<versao>.exe
 //   npm run virustotal -- caminho.exe  usa outro arquivo
 //
 // Gera em dist/: virustotal.json (dados), virustotal.html (selo para colar na pagina) e virustotal.md.
@@ -109,7 +109,7 @@ async function analyze(file, key) {
 module.exports = { analyze };
 
 if (require.main === module) {
-  const file = path.resolve(process.argv[2] || path.join(dist, `DayZ-Toolkit-Setup-${version}.exe`));
+  const file = path.resolve(process.argv[2] || path.join(dist, `DZ-Toolkit-Setup-${version}.exe`));
   analyze(file, process.env.VT_API_KEY).catch((error) => {
     console.error(`Falhou: ${error.message}`);
     process.exit(1);
