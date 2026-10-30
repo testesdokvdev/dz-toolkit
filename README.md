@@ -21,10 +21,15 @@ Código aberto sob a licença [MIT](LICENSE).
 - **Não lê nem mexe na memória do jogo e não injeta código.** Só envia teclas e cliques como se fossem seus
   (`SendInput`) e lista as janelas abertas para achar a do DayZ.
 - **Sem telemetria e sem conta.** A única rede usada é: a consulta UDP ao servidor que você configurar (e o DNS dele)
-  e a checagem de atualização, que consulta a página de download (`dayz-toolkit.netlify.app/baixar`) a cada 2 horas
-  só para ler a versão publicada. A aba Mapa só acessa a rede quando você a abre, e carrega apenas o site do mapa
-  escolhido, o iZurvive ou o Nasdara Map (qualquer outro link abre no navegador). O app apenas avisa; você baixa e instala por conta própria. As preferências
-  (inclusive qual mapa você escolheu) ficam num `settings.json` local.
+  e a checagem de atualização, que a cada 2 horas consulta o `github.com/testesdokvdev/dayz-toolkit` (o feed de
+  Releases, a página da última Release e o arquivo `latest.yml` dela; nada de API com login) só para saber a versão
+  publicada. A aba Mapa só acessa a rede quando você
+  a abre, e carrega apenas o site do mapa escolhido, o iZurvive ou o Nasdara Map (qualquer outro link abre no
+  navegador). As preferências (inclusive qual mapa você escolheu) ficam num `settings.json` local.
+- **A atualização só é baixada quando você clica em Atualizar.** Ao achar versão nova o app apenas avisa. Se você clicar,
+  ele baixa o instalador da Release (conferindo o hash SHA-512 do `latest.yml`), fecha, instala em silêncio e
+  abre de novo. Nunca baixa nem reinicia por conta própria. Sem internet, com o GitHub fora ou se o download falhar,
+  o app segue funcionando: mostra o motivo, deixa tentar de novo ou baixar o instalador na página da Release.
 - **Os mapas são sites de terceiros e seguem as práticas deles.** Cada um roda com sessão própria (cookies e armazenamento
   separados do resto do app e do outro mapa), e o app nega todos os pedidos de permissão deles (câmera, microfone, localização, captura de tela). O
   iZurvive exibe anúncios e carrega rastreadores de publicidade. O Nasdara Map não tem conta, anúncio nem cookie de
@@ -66,16 +71,35 @@ npm run icon       # regenera src/assets/icon.png
    `build/release-notes.en.md` (inglês): um item por linha, começando com `- `. O `npm run release` e o `npm run dist`
    geram `src/changelog.json` a partir delas, e o app mostra essa lista uma vez depois que o usuário atualiza
    (os outros idiomas veem o texto em inglês).
-3. Rode `npm run release -- --dry-run`: gera o instalador e mostra o SHA256, sem publicar.
+3. Rode `npm run release -- --dry-run`: gera o instalador, confere se o `latest.yml` bate com ele (versão, nome,
+   tamanho e hash) e mostra o SHA256, sem publicar.
 4. Ao fim do build, o script pergunta se deve rodar o [VirusTotal](https://www.virustotal.com) agora. Com a chave
    grátis em `VT_API_KEY`, ele envia o instalador e gera o selo para o site em `dist/virustotal.html`. Também dá para
    rodar à parte com `npm run virustotal`. Confira o resultado antes de publicar.
-5. Rode `npm run release` (usa o login do `gh`). Ele pede confirmação e publica a Release com o instalador,
-   o `latest.yml` e o `SHA256SUMS.txt`.
-6. Envie o mesmo instalador para o Google Drive que a página `/baixar` aponta: é o nome do arquivo
-   (`DayZ-Toolkit-Setup-X.Y.Z.exe`) que o app lê para saber qual é a versão mais nova.
+5. Dê o `git push` dos commits (a tag da Release nasce do que já está no GitHub) e rode `npm run release` (usa o
+   login do `gh`). Ele pede confirmação e publica a Release em `testesdokvdev/dayz-toolkit` (o repositório de
+   `build.publish`, no `package.json`) com **uma chamada só** do `gh`: instalador, `.blockmap`, `latest.yml` e
+   `SHA256SUMS.txt`. É isso que os apps instalados leem para se atualizar sozinhos: não há mais Drive nem site a
+   atualizar a cada versão.
 
 Boas práticas: publique poucas versões e espaçadas, não envie várias seguidas.
+
+### Versões antigas (2.5.0 e anteriores)
+
+Elas não têm o atualizador novo: só olham a página `dayz-toolkit.netlify.app/baixar`, que hoje redireciona (302) para um
+arquivo do Google Drive, e leem a versão no nome do instalador (`DayZ-Toolkit-Setup-X.Y.Z.exe`). Para elas migrarem,
+**uma vez**, na primeira Release com atualização automática, faça uma destas duas coisas:
+
+- Apontar o `/baixar` do site (redirect do Netlify) para o instalador dessa Release no GitHub, por exemplo
+  `https://github.com/testesdokvdev/dayz-toolkit/releases/download/vX.Y.Z/DayZ-Toolkit-Setup-X.Y.Z.exe`. O app antigo
+  segue o redirect, lê o nome do arquivo no cabeçalho `content-disposition` (o GitHub o envia como
+  `attachment; filename=DayZ-Toolkit-Setup-X.Y.Z.exe`) e passa a oferecer a versão nova; o botão "Baixar nova versão"
+  abre o `/baixar` no navegador, que redireciona para o arquivo (download direto, sem o aviso de vírus do Drive).
+  Isso foi conferido só com um asset de outro repositório público: o do `testesdokvdev` ainda não tem Release.
+- Ou enviar esse instalador ao Drive que o `/baixar` aponta, como antes.
+
+Cada pessoa instala essa versão na mão uma vez; dali em diante a atualização é automática. Depois disso o `/baixar` pode
+continuar apontando para a Release mais recente (trocando o link a cada versão) ou ficar como está.
 
 ### Assinatura do instalador (recomendado)
 
@@ -89,6 +113,15 @@ CSC_KEY_PASSWORD=senha
 
 Alternativa sem certificado próprio: Azure Trusted Signing (configurar `win.azureSignOptions` no `package.json`).
 
+**A atualização automática e a assinatura.** Hoje o instalador não é assinado (não há certificado nem segredo no repositório)
+e o `package.json` **não** define `publisherName`. Sem ele, o atualizador não confere a assinatura do instalador baixado;
+a integridade vem do HTTPS do GitHub e do hash SHA-512 do `latest.yml`, que o app confere antes de instalar.
+Isso protege contra download corrompido, mas não contra quem controle a conta do GitHub. **No dia em que você assinar:**
+com `CSC_LINK` o electron-builder grava sozinho o `publisherName` (o CN do certificado) no `app-update.yml`, e a partir
+daí o app só aceita atualização cujo instalador tenha assinatura **válida** daquele publicador. Um certificado autoassinado
+(que o Windows não reconhece) faria o app recusar todas as atualizações. Se for assinar, use um certificado de uma
+autoridade reconhecida e mantenha o mesmo publicador em todas as versões seguintes.
+
 ## Créditos
 
 Os mapas da aba **Mapa** são o [iZurvive](https://www.izurvive.com/) (https://www.izurvive.com/) e o
@@ -96,9 +129,6 @@ Os mapas da aba **Mapa** são o [iZurvive](https://www.izurvive.com/) (https://w
 dados e as marcações pertencem aos seus criadores; este projeto não é afiliado ao iZurvive, ao Nasdara Map nem ao
 DayZ (Bohemia Interactive), e o crédito do mapa em uso aparece também na própria aba. O Nasdara Map se descreve como
 projeto não oficial de fãs, gratuito, e não publica termos de uso (só uma política de privacidade).
-
-**Aviso de marca.** DayZ Toolkit é um projeto de fã, independente, não afiliado nem autorizado pela Bohemia Interactive a.s.
-DayZ, Badlands e BattlEye são marcas dos respectivos donos (DayZ e Badlands: Bohemia Interactive a.s.). Este projeto não injeta código nem lê a memória do jogo. Not affiliated with or authorized by Bohemia Interactive a.s.; DayZ is a trademark of Bohemia Interactive a.s.
 
 ## Idiomas
 
@@ -117,7 +147,7 @@ src/main/      processo principal
   toolkit.js     estado e lógica das ferramentas
   win32.js       API do Windows (janelas, foco, SendInput)
   a2s.js         consulta Steam A2S do monitor de servidor
-  updater.js     avisa de versão nova lendo a página de download
+  updater.js     atualização automática pelas Releases do GitHub (electron-updater)
   settings.js    preferências salvas
   i18n.js        idiomas (carrega src/locales e traduz os avisos)
   toast.js       aviso flutuante no canto da tela

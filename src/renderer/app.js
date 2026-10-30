@@ -7,7 +7,7 @@ const call = (method, ...args) => window.toolkit.call(method, ...args);
 
 let state = null;
 let updateState = null;
-let updateModalShown = false;
+let updateShownFor = null; // estado ('available' ou 'error') pelo qual a janela de atualizacao ja abriu sozinha
 let whatsNewData = null; // { version, notes, auto } ou null se esta versao nao tem novidades escritas
 
 // ---------------------------------------------------------------------
@@ -564,23 +564,54 @@ $('target-change').addEventListener('click', () => {
 $('window-refresh').addEventListener('click', loadWindows);
 
 // --- Atualizacao ---
+// Tamanho (sem casas) e velocidade (1 casa) no idioma da interface
+const formatMB = (bytes, digits) => (bytes / 1048576).toLocaleString(i18n.language, { maximumFractionDigits: digits });
+
 function renderUpdate() {
   const u = updateState;
   if (!u) return;
-  const visible = u.status === 'available';
+  const visible = ['available', 'downloading', 'installing', 'error'].includes(u.status);
   $('update-pill').classList.toggle('hidden', !visible);
-  if (!visible) return;
+  if (!visible) {
+    updateShownFor = null;
+    return;
+  }
 
-  $('update-pill-text').textContent = t('update.pill', { version: u.version });
+  const busy = u.status === 'downloading' || u.status === 'installing';
+  const failed = u.status === 'error';
+  const percent = Math.floor(u.percent || 0);
+  if (busy) updateShownFor = null; // uma falha nova depois de "Tentar de novo" volta a abrir a janela
+  const pill = { available: 'update.pill', downloading: 'update.pill.downloading', installing: 'update.pill.installing', error: 'update.pill.error' };
+  $('update-pill-text').textContent = t(pill[u.status], { version: u.version, percent });
   $('update-title').textContent = t('update.title', { version: u.version });
 
-  const btn = $('update-now');
-  btn.innerHTML = `${icon('download')}<span></span>`;
-  btn.querySelector('span').textContent = t('update.now');
+  const text = { available: 'update.howto', downloading: 'update.downloading', installing: 'update.installing' };
+  $('update-text').textContent = t(failed ? `update.error.${u.error}` : text[u.status]);
+  // A falha vem acompanhada do aviso de que o app atual segue funcionando
+  $('update-notice').classList.toggle('is-error', failed);
+  $('update-note')?.remove();
+  if (failed) {
+    const note = document.createElement('p');
+    note.id = 'update-note';
+    note.textContent = t('update.error.note');
+    $('update-notice').appendChild(note);
+  }
 
-  // Abre sozinho uma vez quando a atualizacao aparece
-  if (u.status === 'available' && !updateModalShown) {
-    updateModalShown = true;
+  $('update-progress').classList.toggle('hidden', !busy);
+  $('update-bar').style.width = `${u.status === 'installing' ? 100 : percent}%`;
+  $('update-stats').textContent = u.total
+    ? t('update.stats', { percent, done: formatMB(u.transferred, 0), total: formatMB(u.total, 0), speed: formatMB(u.bytesPerSecond, 1) })
+    : t('update.stats.start');
+
+  $('update-later').classList.toggle('hidden', busy);
+  $('update-manual').classList.toggle('hidden', !failed);
+  $('update-now').classList.toggle('hidden', busy);
+  $('update-now').innerHTML = `${icon('download')}<span></span>`;
+  $('update-now').querySelector('span').textContent = t(failed ? 'update.retry' : 'update.now');
+
+  // Abre sozinho uma vez quando a atualizacao aparece e quando uma falha acontece (o usuario pode ter fechado a janela durante o download)
+  if ((u.status === 'available' || failed) && updateShownFor !== u.status) {
+    updateShownFor = u.status;
     openModal('update-modal');
   }
 }
@@ -604,10 +635,8 @@ function renderWhatsNew() {
 $('version').addEventListener('click', () => {
   if (whatsNewData) openModal('whatsnew-modal');
 });
-$('update-now').addEventListener('click', () => {
-  window.updater.download();
-  closeModal('update-modal');
-});
+$('update-now').addEventListener('click', () => window.updater.download());
+$('update-manual').addEventListener('click', () => window.updater.openReleases());
 
 // ---------------------------------------------------------------------
 // Inicio

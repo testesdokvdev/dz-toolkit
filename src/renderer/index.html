@@ -446,9 +446,14 @@
         </div>
         <button class="icon-btn" data-close data-i18n-title="common.close" data-i18n-aria="common.close" data-icon="x"></button>
       </div>
-      <div class="notice"><p data-i18n="update.howto"></p></div>
+      <div class="notice" id="update-notice"><p id="update-text"></p></div>
+      <div class="update-progress hidden" id="update-progress">
+        <div class="progress-track"><div class="progress-fill" id="update-bar"></div></div>
+        <p class="muted small-text" id="update-stats"></p>
+      </div>
       <div class="modal-actions">
-        <button class="btn ghost" data-close data-i18n="update.later"></button>
+        <button class="btn ghost" id="update-later" data-close data-i18n="update.later"></button>
+        <button class="btn ghost hidden" id="update-manual" data-i18n="update.manual"></button>
         <button class="btn primary" id="update-now"></button>
       </div>
     </div>

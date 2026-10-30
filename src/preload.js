@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld('toolkit', {
 contextBridge.exposeInMainWorld('updater', {
   state: () => ipcRenderer.invoke('updater:state'),
   download: () => ipcRenderer.invoke('updater:download'),
+  openReleases: () => ipcRenderer.invoke('updater:releases'),
   onState: subscribe('updater:state'),
 });
 

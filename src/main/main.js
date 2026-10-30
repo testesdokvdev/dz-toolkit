@@ -115,6 +115,7 @@ if (!app.requestSingleInstanceLock()) {
     });
     ipcMain.handle('updater:state', () => ({ ...updater.state }));
     ipcMain.handle('updater:download', () => updater.download());
+    ipcMain.handle('updater:releases', () => updater.openReleases());
     ipcMain.handle('i18n:get', () => i18n.payload());
     ipcMain.handle('i18n:set', (_e, code) => i18n.set(code));
     ipcMain.handle('whatsnew:get', () => whatsNew.get());

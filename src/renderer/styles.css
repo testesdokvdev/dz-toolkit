@@ -621,3 +621,10 @@ select#overlay-display:focus-visible { border-color: var(--blue); }
 @media (max-width: 1000px) {
   .grid { grid-template-columns: 1fr; }
 }
+
+/* Atualizacao: barra de progresso do download e aviso de falha */
+.notice.is-error { border-left-color: var(--red); }
+.update-progress { margin-top: 14px; }
+.progress-track { height: 8px; border-radius: 999px; background: var(--panel-3); overflow: hidden; }
+.progress-fill { width: 0; height: 100%; border-radius: inherit; background: var(--green-strong); transition: width .25s ease; }
+.update-progress .small-text { margin: 8px 0 0; font-variant-numeric: tabular-nums; }

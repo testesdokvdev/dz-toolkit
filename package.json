@@ -8,6 +8,7 @@
   "main": "src/main/main.js",
   "private": true,
   "dependencies": {
+    "electron-updater": "^6.8.11",
     "koffi": "^3.3.3"
   },
   "devDependencies": {
