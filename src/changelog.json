@@ -1,0 +1,13 @@
+{
+  "version": "2.5.0",
+  "notes": {
+    "pt-BR": [
+      "Rádio Nasdara: decodificação ao vivo agora em linha única (corrige coluna gigante e bipes vazando)",
+      "Aba Mapa: novo seletor para escolher entre o iZurvive e o Nasdara Map (nasdaramap.com). O app lembra a escolha, o crédito e o link mudam junto, e o botão \"Ver no mapa\" do Rádio Nasdara abre o mapa que estiver escolhido"
+    ],
+    "en": [
+      "Nasdara radio: live decoding is now a single line (fixes the giant column and the beeps spilling out)",
+      "Map tab: new selector to choose between iZurvive and Nasdara Map (nasdaramap.com). The app remembers your choice, the credit and link change with it, and the Nasdara radio’s “Show on map” button opens whichever map is selected"
+    ]
+  }
+}

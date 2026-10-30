@@ -1,0 +1,34 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  user-select: none;
+  font: 14px "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "Nirmala UI", system-ui, sans-serif;
+}
+
+.hidden { display: none !important; }
+/* O cartao preenche a janela inteira: o Windows impoe uma altura minima as janelas, e o que sobrasse em volta
+   do cartao teria de ser transparente (e as vezes sai preto). O tamanho natural e o do .inner mais as bordas. */
+.clock {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  padding: 4px 10px 4px 8px;
+  border: 1px solid #2f3646;
+  border-radius: 8px;
+  background: #141821; /* sem transparencia: o fundo nao depende de o Windows compor a janela com alfa */
+  color: #e7eaf0;
+  line-height: 1;
+  white-space: nowrap;
+}
+.inner { display: flex; align-items: center; gap: 6px; width: max-content; }
+/* Sol ou lua conforme a hora atual do servidor (so isso: nada e calculado para frente) */
+.sky { display: flex; flex: none; }
+.sky svg { width: 16px; height: 16px; }
+.sky.day { color: #f5b945; }
+.sky.night { color: #6aa8ff; }
+strong { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .02em; }

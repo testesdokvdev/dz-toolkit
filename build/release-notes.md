@@ -1,0 +1,2 @@
+- Rádio Nasdara: decodificação ao vivo agora em linha única (corrige coluna gigante e bipes vazando)
+- Aba Mapa: novo seletor para escolher entre o iZurvive e o Nasdara Map (nasdaramap.com). O app lembra a escolha, o crédito e o link mudam junto, e o botão "Ver no mapa" do Rádio Nasdara abre o mapa que estiver escolhido

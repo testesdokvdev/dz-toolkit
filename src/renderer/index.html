@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+  <title>DayZ Toolkit</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="titlebar">
+    <div class="titlebar-brand">
+      <img src="../assets/icon.png" alt="" class="titlebar-logo">
+      <span>DayZ Toolkit</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- ===================== Menu lateral ===================== -->
+    <aside class="sidebar">
+      <nav class="nav" id="nav">
+        <button class="nav-item active" data-page="autorun">
+          <span class="nav-icon" data-icon="run"></span>
+          <span class="nav-text"><strong data-i18n="nav.autorun"></strong><small id="nav-sub-autorun"></small></span>
+          <span class="nav-dot" id="nav-dot-autorun"></span>
+        </button>
+        <button class="nav-item" data-page="clicker">
+          <span class="nav-icon" data-icon="crosshair"></span>
+          <span class="nav-text"><strong data-i18n="nav.clicker"></strong><small id="nav-sub-clicker"></small></span>
+          <span class="nav-dot" id="nav-dot-clicker"></span>
+        </button>
+        <button class="nav-item" data-page="server">
+          <span class="nav-icon" data-icon="server"></span>
+          <span class="nav-text"><strong data-i18n="nav.server"></strong><small id="nav-sub-server"></small></span>
+          <span class="nav-dot" id="nav-dot-server"></span>
+        </button>
+        <button class="nav-item" data-page="overlay">
+          <span class="nav-icon" data-icon="clock"></span>
+          <span class="nav-text"><strong data-i18n="nav.overlay"></strong><small id="nav-sub-overlay"></small></span>
+          <span class="nav-dot" id="nav-dot-overlay"></span>
+        </button>
+        <button class="nav-item" data-page="radio">
+          <span class="nav-icon" data-icon="radio"></span>
+          <span class="nav-text"><strong data-i18n="nav.radio"></strong><small id="nav-sub-radio"></small></span>
+          <span class="nav-dot" id="nav-dot-radio"></span>
+        </button>
+        <button class="nav-item" data-page="map">
+          <span class="nav-icon" data-icon="map"></span>
+          <span class="nav-text"><strong data-i18n="nav.map"></strong><small id="map-nav"></small></span>
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button class="update-pill hidden" id="update-pill">
+          <span data-icon="download"></span>
+          <span id="update-pill-text"></span>
+        </button>
+
+        <div class="target-card" id="target-card">
+          <div class="target-head">
+            <span class="target-label" data-i18n="target.label"></span>
+            <button class="icon-btn" id="target-change" data-i18n-title="target.change" data-i18n-aria="target.change" data-icon="refresh"></button>
+          </div>
+          <div class="target-body">
+            <span class="status-dot" id="target-dot"></span>
+            <div class="target-text">
+              <strong id="target-name"></strong>
+              <small id="target-state"></small>
+            </div>
+          </div>
+        </div>
+
+        <div class="lang-row">
+          <!-- Seletor de idioma: globo + nome de cada idioma na propria lingua (sem bandeiras) -->
+          <div class="lang-picker">
+            <span class="lang-icon" data-icon="globe"></span>
+            <select id="lang-select" data-i18n-title="lang.label" data-i18n-aria="lang.label"></select>
+            <span class="lang-chevron" data-icon="chevron"></span>
+          </div>
+          <button class="icon-btn settings-btn" id="settings-open" data-i18n-title="settings.open" data-i18n-aria="settings.open" data-icon="settings"></button>
+        </div>
+
+        <button class="version" id="version" data-i18n-title="whatsnew.open" disabled></button>
+      </div>
+    </aside>
+
+    <!-- ===================== Conteúdo ===================== -->
+    <main class="content">
+
+      <!-- Auto Run -->
+      <section class="page active" id="page-autorun">
+        <header class="page-head">
+          <h1 data-i18n="nav.autorun"></h1>
+          <p data-i18n-html="autorun.desc.html"></p>
+        </header>
+        <div class="grid">
+          <div class="card hero" id="hero-autorun">
+            <div class="hero-icon" data-icon="run"></div>
+            <div class="hero-text">
+              <span class="hero-label" data-i18n="hero.status"></span>
+              <strong class="hero-status" id="autorun-status"></strong>
+              <span class="hero-hint" id="autorun-hint"></span>
+            </div>
+            <label class="switch big" data-i18n-title="hero.toggle">
+              <input type="checkbox" id="autorun-armed" data-i18n-aria="hero.toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="card">
+            <h2 data-i18n="hotkey.title"></h2>
+            <p class="muted" data-i18n="autorun.hotkeyHint"></p>
+            <div class="hotkey" data-feature="autorun"></div>
+            <p class="hotkey-note" data-i18n-html="hotkey.note.html"></p>
+          </div>
+
+          <div class="card">
+            <h2 data-i18n="howto.title"></h2>
+            <ol class="steps">
+              <li data-i18n-html="autorun.step1.html"></li>
+              <li data-i18n="autorun.step2"></li>
+              <li data-i18n="autorun.step3"></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cliques Automáticos -->
+      <section class="page" id="page-clicker">
+        <header class="page-head">
+          <h1 data-i18n="nav.clicker"></h1>
+          <p data-i18n="clicker.desc"></p>
+        </header>
+        <div class="grid">
+          <div class="card hero" id="hero-clicker">
+            <div class="hero-icon" data-icon="crosshair"></div>
+            <div class="hero-text">
+              <span class="hero-label" data-i18n="hero.status"></span>
+              <strong class="hero-status" id="clicker-status"></strong>
+              <span class="hero-hint" id="clicker-hint"></span>
+            </div>
+            <label class="switch big" data-i18n-title="hero.toggle">
+              <input type="checkbox" id="clicker-armed" data-i18n-aria="hero.toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="card">
+            <h2 data-i18n="hotkey.title"></h2>
+            <p class="muted" data-i18n="clicker.hotkeyHint"></p>
+            <div class="hotkey" data-feature="clicker"></div>
+            <p class="hotkey-note" data-i18n-html="hotkey.note.html"></p>
+          </div>
+
+          <div class="card">
+            <h2 data-i18n="howto.title"></h2>
+            <ol class="steps">
+              <li data-i18n="clicker.step1"></li>
+              <li data-i18n="clicker.step2"></li>
+              <li data-i18n="clicker.step3"></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- Monitor de servidor -->
+      <section class="page" id="page-server">
+        <header class="page-head">
+          <h1 data-i18n="nav.server"></h1>
+          <p data-i18n="server.desc"></p>
+        </header>
+        <div class="grid server-grid">
+          <div class="card">
+            <h2 data-i18n="server.title"></h2>
+            <div class="fields">
+              <label class="field grow">
+                <span data-i18n="server.host"></span>
+                <input type="text" id="server-host" spellcheck="false" placeholder="XXX.XXX.XXX.XXX">
+              </label>
+              <label class="field small">
+                <span data-i18n="server.port"></span>
+                <input type="number" id="server-port" min="1" max="65535" placeholder="2302">
+              </label>
+            </div>
+            <div class="locked-note hidden" id="server-locked">
+              <p id="server-locked-text"></p>
+              <p class="muted small-text" id="server-locked-dep"></p>
+              <button class="btn" id="server-locked-stop" data-i18n="server.locked.stop"></button>
+            </div>
+            <details class="advanced">
+              <summary data-i18n="server.advanced"></summary>
+              <label class="field small">
+                <span data-i18n="server.qport"></span>
+                <input type="number" id="server-qport" min="1" max="65535" data-i18n-placeholder="server.qport.placeholder">
+              </label>
+              <p class="muted small-text" data-i18n="server.qport.hint"></p>
+            </details>
+            <p class="form-error hidden" id="server-error"></p>
+          </div>
+
+          <div class="card">
+            <h2 data-i18n="sound.title"></h2>
+            <p class="muted" data-i18n="sound.hint"></p>
+            <div class="volume">
+              <button class="icon-btn round" id="vol-down" data-i18n-title="sound.down" data-i18n-aria="sound.down">−</button>
+              <input type="range" id="vol-range" min="0" max="100" step="5" data-i18n-aria="sound.title">
+              <button class="icon-btn round" id="vol-up" data-i18n-title="sound.up" data-i18n-aria="sound.up">+</button>
+              <span class="volume-value" id="vol-value">70%</span>
+            </div>
+            <button class="btn ghost" id="vol-test"><span data-icon="volume"></span><span data-i18n="sound.test"></span></button>
+          </div>
+
+          <!-- Aviso de restart: testa a cada segundo e avisa quando o servidor volta -->
+          <div class="card hero" id="hero-server">
+            <div class="hero-icon" data-icon="server"></div>
+            <div class="hero-text">
+              <span class="hero-label"><span data-i18n="server.restart.label"></span> <span class="tag beta" data-i18n-title="server.beta.hint">BETA</span></span>
+              <strong class="hero-status" id="server-status"></strong>
+              <span class="hero-hint" id="server-hint"></span>
+              <div class="confirm-bar hidden" id="server-confirm"></div>
+            </div>
+            <button class="btn primary big" id="server-toggle"></button>
+          </div>
+
+          <div class="card server-info hidden" id="server-info">
+            <h2 data-i18n="server.found"></h2>
+            <strong class="server-name" id="info-name"></strong>
+            <div class="players">
+              <div class="players-bar"><div id="info-bar"></div></div>
+              <span id="info-players"></span>
+            </div>
+            <div class="info-row"><span data-i18n="server.map"></span><strong id="info-map"></strong></div>
+            <div class="info-row"><span data-i18n="server.qportShort"></span><strong id="info-qport"></strong></div>
+          </div>
+
+          <!-- Status ao vivo: consulta a cada minuto, sem avisar nada -->
+          <div class="card hero" id="hero-live">
+            <div class="hero-icon" data-icon="activity"></div>
+            <div class="hero-text">
+              <span class="hero-label" data-i18n="live.label"></span>
+              <strong class="hero-status" id="live-status"></strong>
+              <span class="hero-hint" id="live-hint"></span>
+            </div>
+            <label class="switch big" data-i18n-title="live.toggle">
+              <input type="checkbox" id="live-armed" data-i18n-aria="live.toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="card live-data hidden" id="live-data">
+            <h2 data-i18n="live.title"></h2>
+            <strong class="server-name" id="live-name"></strong>
+            <div class="stats">
+              <div class="stat">
+                <span data-i18n="live.time"></span>
+                <strong><i class="sky-icon" id="live-sky-icon"></i><b id="live-time"></b></strong>
+              </div>
+              <div class="stat">
+                <span data-i18n="live.queue"></span>
+                <strong id="live-queue"></strong>
+              </div>
+              <div class="stat">
+                <span data-i18n="live.players"></span>
+                <strong id="live-players"></strong>
+                <div class="players-bar"><div id="live-bar"></div></div>
+              </div>
+              <div class="stat">
+                <span data-i18n="live.ping"></span>
+                <strong id="live-ping"></strong>
+              </div>
+              <div class="stat">
+                <span data-i18n="live.version"></span>
+                <strong id="live-version"></strong>
+                <small id="live-version-note"></small>
+              </div>
+              <div class="stat">
+                <span data-i18n="server.map"></span>
+                <strong id="live-map"></strong>
+              </div>
+            </div>
+            <p class="muted small-text" id="live-updated"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Relógio na tela -->
+      <section class="page" id="page-overlay">
+        <header class="page-head">
+          <h1 data-i18n="nav.overlay"></h1>
+          <p data-i18n="overlay.desc"></p>
+        </header>
+        <div class="grid">
+          <div class="card hero" id="hero-overlay">
+            <div class="hero-icon" data-icon="clock"></div>
+            <div class="hero-text">
+              <span class="hero-label" data-i18n="overlay.label"></span>
+              <strong class="hero-status" id="overlay-status"></strong>
+              <span class="hero-hint" id="overlay-hint"></span>
+            </div>
+            <label class="switch big" data-i18n-title="overlay.toggle">
+              <input type="checkbox" id="overlay-armed" data-i18n-aria="overlay.toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="card overlay-position">
+            <h2 data-i18n="overlay.pos.title"></h2>
+            <p class="muted" data-i18n="overlay.pos.hint"></p>
+            <div class="overlay-pos">
+              <div class="screen-pick" id="overlay-corners" role="radiogroup" data-i18n-aria="overlay.pos.title">
+                <button data-corner="tl" role="radio" data-i18n-title="overlay.corner.tl" data-i18n-aria="overlay.corner.tl"></button>
+                <button data-corner="tr" role="radio" data-i18n-title="overlay.corner.tr" data-i18n-aria="overlay.corner.tr"></button>
+                <button data-corner="bl" role="radio" data-i18n-title="overlay.corner.bl" data-i18n-aria="overlay.corner.bl"></button>
+                <button data-corner="br" role="radio" data-i18n-title="overlay.corner.br" data-i18n-aria="overlay.corner.br"></button>
+              </div>
+              <div class="overlay-fine">
+                <div class="fields">
+                  <label class="field small">
+                    <span data-i18n="overlay.x"></span>
+                    <input type="number" id="overlay-x" step="1">
+                  </label>
+                  <label class="field small">
+                    <span data-i18n="overlay.y"></span>
+                    <input type="number" id="overlay-y" step="1">
+                  </label>
+                </div>
+                <label class="field hidden" id="overlay-display-field">
+                  <span data-i18n="overlay.display"></span>
+                  <select id="overlay-display"></select>
+                </label>
+                <p class="muted small-text" data-i18n="overlay.fine.hint"></p>
+                <button class="btn ghost" id="overlay-reset"><span data-i18n="overlay.reset"></span></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 data-i18n="overlay.note.title"></h2>
+            <ol class="steps">
+              <li data-i18n-html="overlay.note.mode.html"></li>
+              <li data-i18n="overlay.note.focus"></li>
+              <li data-i18n="overlay.note.server"></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- Rádio dos bunkers (Nasdara) -->
+      <section class="page" id="page-radio">
+        <header class="page-head">
+          <h1 data-i18n="nav.radio"></h1>
+          <p data-i18n-html="radio.desc.html"></p>
+        </header>
+        <p class="beta-note"><span class="tag beta">BETA</span> <span data-i18n="radio.beta.note"></span></p>
+        <div class="grid">
+          <div class="card hero" id="hero-radio">
+            <div class="hero-icon" data-icon="radio"></div>
+            <div class="hero-text">
+              <span class="hero-label"><span data-i18n="radio.label"></span> <span class="tag beta" data-i18n-title="radio.beta.hint">BETA</span></span>
+              <strong class="hero-status" id="radio-status"></strong>
+              <span class="hero-hint" id="radio-hint"></span>
+              <div class="confirm-bar hidden" id="radio-meter"><span id="radio-meter-bar"></span></div>
+            </div>
+            <button class="btn primary big" id="radio-toggle"></button>
+          </div>
+
+          <!-- Decodificação ao vivo: o que o app está ouvindo e lendo agora -->
+          <div class="card radio-live-card">
+            <div class="radio-live-head">
+              <h2 data-i18n="radio.live.title"></h2>
+              <span class="radio-live-dot" id="radio-live-dot"></span>
+            </div>
+            <div id="radio-live"></div>
+            <p class="muted small-text" data-i18n="radio.live.hint"></p>
+          </div>
+
+          <div class="card">
+            <h2 data-i18n="radio.how.title"></h2>
+            <ol class="steps">
+              <li data-i18n-html="radio.how.1.html"></li>
+              <li data-i18n-html="radio.how.2.html"></li>
+              <li data-i18n-html="radio.how.3.html"></li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <h2 data-i18n="radio.tips.title"></h2>
+            <ul class="radio-tips">
+              <li data-i18n-html="radio.tip.1.html"></li>
+              <li data-i18n="radio.tip.2"></li>
+              <li data-i18n="radio.tip.3"></li>
+            </ul>
+          </div>
+
+          <div class="card radio-results-card">
+            <h2 data-i18n="radio.results.title"></h2>
+            <div id="radio-results"></div>
+            <p class="muted small-text" data-i18n="radio.results.hint"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mapa (iZurvive ou Nasdara Map) -->
+      <section class="page" id="page-map">
+        <div class="map-bar">
+          <div class="map-switch" id="map-switch" role="radiogroup" data-i18n-aria="map.switch"></div>
+          <span class="map-credit">
+            <span id="map-credit-text"></span>
+            <button class="link" id="map-credit-link" data-i18n-title="map.external"></button>
+          </span>
+          <div class="map-actions">
+            <button class="btn ghost" id="map-home"><span data-i18n="map.home"></span></button>
+            <button class="btn ghost" id="map-reload" data-i18n-title="map.reload" data-icon="refresh"></button>
+            <button class="btn ghost" id="map-external"><span data-i18n="map.external"></span></button>
+          </div>
+        </div>
+        <div class="map-host" id="map-host"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===================== Seletor de janela ===================== -->
+  <div class="modal-backdrop hidden" id="window-modal">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2 data-i18n="window.title"></h2>
+          <p class="muted" data-i18n="window.sub"></p>
+        </div>
+        <button class="icon-btn" data-close data-i18n-title="common.close" data-i18n-aria="common.close" data-icon="x"></button>
+      </div>
+      <div class="window-list" id="window-list"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="window-refresh"><span data-icon="refresh"></span><span data-i18n="window.refresh"></span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Atualização ===================== -->
+  <div class="modal-backdrop hidden" id="update-modal">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2 id="update-title"></h2>
+          <p class="muted" id="update-sub"></p>
+        </div>
+        <button class="icon-btn" data-close data-i18n-title="common.close" data-i18n-aria="common.close" data-icon="x"></button>
+      </div>
+      <div class="notice"><p data-i18n="update.howto"></p></div>
+      <div class="modal-actions">
+        <button class="btn ghost" data-close data-i18n="update.later"></button>
+        <button class="btn primary" id="update-now"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Configurações ===================== -->
+  <div class="modal-backdrop hidden" id="settings-modal">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2 data-i18n="settings.title"></h2>
+        </div>
+        <button class="icon-btn" data-close data-i18n-title="common.close" data-i18n-aria="common.close" data-icon="x"></button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <h3 data-i18n="settings.gpu.title"></h3>
+          <p class="muted small-text" data-i18n="settings.gpu.desc"></p>
+        </div>
+        <label class="switch" data-i18n-title="settings.gpu.toggle">
+          <input type="checkbox" id="gpu-compositing" data-i18n-aria="settings.gpu.toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="notice hidden" id="gpu-restart">
+        <p data-i18n="settings.restart.notice"></p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" data-close data-i18n="common.close"></button>
+        <button class="btn primary hidden" id="gpu-restart-now" data-i18n="settings.restart.now"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Novidades (depois de atualizar) ===================== -->
+  <div class="modal-backdrop hidden" id="whatsnew-modal">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2 id="whatsnew-title"></h2>
+        </div>
+        <button class="icon-btn" data-close data-i18n-title="common.close" data-i18n-aria="common.close" data-icon="x"></button>
+      </div>
+      <ul class="changes" id="whatsnew-list"></ul>
+      <div class="modal-actions">
+        <button class="btn primary" data-close data-i18n="whatsnew.ok"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Aviso (aparece toda vez que o app abre) ===================== -->
+  <div class="modal-backdrop" id="notice-modal">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2 data-i18n="notice.title"></h2>
+        </div>
+      </div>
+      <div class="notice">
+        <p data-i18n="notice.p1"></p>
+        <p data-i18n-html="notice.p2.html"></p>
+        <p data-i18n="notice.p3"></p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary" data-close id="notice-ok" data-i18n="notice.ok"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
+  <script src="../shared/daycycle.js"></script>
+  <script src="../shared/morse.js"></script>
+  <script src="../shared/nasdara.js"></script>
+  <script src="radio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

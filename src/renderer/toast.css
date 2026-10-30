@@ -1,0 +1,31 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  font: 14px "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+}
+.toast {
+  position: absolute;
+  inset: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px 0 0;
+  border: 1px solid #2f3646;
+  border-radius: 12px;
+  background: rgba(20, 24, 33, 0.96);
+  color: #e7eaf0;
+  overflow: hidden;
+  animation: in .2s ease;
+}
+@keyframes in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+.bar { width: 5px; align-self: stretch; background: #6aa8ff; flex: none; }
+.success .bar { background: #3ddc84; }
+.danger .bar { background: #f26d6d; }
+.text { display: flex; flex-direction: column; min-width: 0; }
+strong { font-size: 14px; font-weight: 700; letter-spacing: .02em; }
+.success strong { color: #3ddc84; }
+.danger strong { color: #f26d6d; }
+small { color: #b4bccb; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+small:empty { display: none; }

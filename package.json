@@ -1,0 +1,83 @@
+{
+  "name": "dayz-toolkit",
+  "productName": "DayZ Toolkit",
+  "version": "2.5.0",
+  "description": "Auto Run, Cliques Automáticos e Monitor de Servidor para DayZ",
+  "author": "Kevin Morente",
+  "license": "MIT",
+  "main": "src/main/main.js",
+  "private": true,
+  "dependencies": {
+    "koffi": "^3.3.3"
+  },
+  "devDependencies": {
+    "electron": "^44.9.0",
+    "electron-builder": "^26.15.3"
+  },
+  "allowScripts": {
+    "koffi@3.3.3": true,
+    "electron-winstaller": false
+  },
+  "repository": "https://github.com/testesdokvdev/dayz-toolkit",
+  "scripts": {
+    "start": "node scripts/start.js",
+    "icon": "node scripts/start.js scripts/make-icon.js",
+    "dist": "node scripts/changelog.js && node scripts/clean-dist.js && electron-builder --win",
+    "bump": "node scripts/bump.js",
+    "release": "node scripts/release.js",
+    "virustotal": "node scripts/virustotal.js"
+  },
+  "build": {
+    "appId": "br.com.kevinmorente.dayztoolkit",
+    "productName": "DayZ Toolkit",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/koffi/**",
+      "node_modules/@koromix/**"
+    ],
+    "npmRebuild": false,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "src/assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "language": "1046",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "DayZ Toolkit",
+      "artifactName": "DayZ-Toolkit-Setup-${version}.${ext}",
+      "installerLanguages": [
+        "pt_BR"
+      ]
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "testesdokvdev",
+        "repo": "dayz-toolkit",
+        "releaseType": "release"
+      }
+    ],
+    "electronLanguages": [
+      "pt-BR",
+      "en-US"
+    ]
+  }
+}

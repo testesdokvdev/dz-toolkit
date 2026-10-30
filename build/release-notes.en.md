@@ -1,0 +1,2 @@
+- Nasdara radio: live decoding is now a single line (fixes the giant column and the beeps spilling out)
+- Map tab: new selector to choose between iZurvive and Nasdara Map (nasdaramap.com). The app remembers your choice, the credit and link change with it, and the Nasdara radio’s “Show on map” button opens whichever map is selected
