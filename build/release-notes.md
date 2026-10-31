@@ -1,4 +1,1 @@
-- Atualização automática: quando sai versão nova, o aviso ganha o botão Atualizar. O app baixa sozinho, com barra de progresso, instala em silêncio e reabre já atualizado, sem você rodar instalador. Nada baixa antes do seu clique
-- Rádio Nasdara: decodificação ao vivo agora em linha única (corrige coluna gigante e bipes vazando)
-- Aba Mapa: novo seletor para escolher entre o iZurvive e o Nasdara Map (nasdaramap.com). O app lembra a escolha, o crédito e o link mudam junto, e o botão "Ver no mapa" do Rádio Nasdara continua abrindo sempre o iZurvive, de onde vêm as coordenadas
-- O app agora se chama DZ Toolkit. Suas preferências e as marcações dos mapas continuam como estavam, e o instalador novo atualiza a instalação antiga (sem ficar com dois apps). Se você tinha o app fixado na barra de tarefas, fixe de novo
+- Ajustes internos, sem mudança no uso do app. Esta versão também confirma que a atualização automática funciona: se você chegou aqui pelo botão Atualizar, deu tudo certo

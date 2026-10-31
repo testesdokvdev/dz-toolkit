@@ -1,4 +1,1 @@
-- Automatic updates: when a new version is out, the notice gets an Update button. The app downloads it by itself with a progress bar, installs silently and reopens already updated, with no installer to run. Nothing downloads before you click
-- Nasdara radio: live decoding is now a single line (fixes the giant column and the beeps spilling out)
-- Map tab: new selector to choose between iZurvive and Nasdara Map (nasdaramap.com). The app remembers your choice, the credit and link change with it, and the Nasdara radio’s “Show on map” button still always opens iZurvive, where the coordinates come from
-- The app is now called DZ Toolkit. Your settings and map markers stay as they were, and the new installer updates the old install (no two apps side by side). If you had the app pinned to the taskbar, pin it again
+- Internal tweaks, nothing changes in how you use the app. This version also confirms that automatic updates work: if you got here through the Update button, it all worked
