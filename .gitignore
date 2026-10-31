@@ -1,3 +1,27 @@
 node_modules/
 dist/
-.claude/settings.local.json
+.claude/
+
+# Segredos e certificados de assinatura
+.env
+.env.*
+*.pfx
+*.p12
+*.pem
+*.key
+
+# Logs e temporários
+*.log
+npm-debug.log*
+*.tmp
+*.bak
+
+# Dados de teste do Electron (--user-data-dir)
+userdata*/
+test-profile*/
+
+# Editor e sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
