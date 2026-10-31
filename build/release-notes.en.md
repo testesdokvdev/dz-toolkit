@@ -1,1 +1,4 @@
-- Internal tweaks, nothing changes in how you use the app. This version also confirms that automatic updates work: if you got here through the Update button, it all worked
+- Internal tweaks, nothing changes in how you use the app. This version also serves to confirm that automatic updates work
+- Automatic updates (since 2.6.0): when a new version is out, the notice gets an Update button. The app downloads it by itself with a progress bar, installs silently and reopens already updated, with no installer to run. Nothing downloads before you click
+- The app is called DZ Toolkit (formerly DayZ Toolkit). Your settings and map markers stay as they were, and the new installer updates the old install (no two apps side by side). If you had the app pinned to the taskbar, pin it again
+- The Nasdara radio’s “Show on map” button always opens iZurvive, where the coordinates come from

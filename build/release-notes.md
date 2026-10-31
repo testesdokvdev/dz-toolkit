@@ -1,1 +1,4 @@
-- Ajustes internos, sem mudança no uso do app. Esta versão também confirma que a atualização automática funciona: se você chegou aqui pelo botão Atualizar, deu tudo certo
+- Ajustes internos, sem mudança no uso do app. Esta versão também serve para confirmar que a atualização automática funciona
+- Atualização automática (desde a 2.6.0): quando sai versão nova, o aviso ganha o botão Atualizar. O app baixa sozinho, com barra de progresso, instala em silêncio e reabre já atualizado, sem você rodar instalador. Nada baixa antes do seu clique
+- O app se chama DZ Toolkit (antes DayZ Toolkit). Suas preferências e as marcações dos mapas continuam como estavam, e o instalador novo atualiza a instalação antiga (sem ficar com dois apps). Se você tinha o app fixado na barra de tarefas, fixe de novo
+- O botão "Ver no mapa" do Rádio Nasdara abre sempre o iZurvive, de onde vêm as coordenadas
