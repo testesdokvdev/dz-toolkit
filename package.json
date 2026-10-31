@@ -19,7 +19,7 @@
     "koffi@3.3.3": true,
     "electron-winstaller": false
   },
-  "repository": "https://github.com/testesdokvdev/dayz-toolkit",
+  "repository": "https://github.com/testesdokvdev/dz-toolkit",
   "scripts": {
     "start": "node scripts/start.js",
     "icon": "node scripts/start.js scripts/make-icon.js",
@@ -72,7 +72,7 @@
       {
         "provider": "github",
         "owner": "testesdokvdev",
-        "repo": "dayz-toolkit",
+        "repo": "dz-toolkit",
         "releaseType": "release"
       }
     ],

@@ -21,7 +21,7 @@ Código aberto sob a licença [MIT](LICENSE).
 - **Não lê nem mexe na memória do jogo e não injeta código.** Só envia teclas e cliques como se fossem seus
   (`SendInput`) e lista as janelas abertas para achar a do DZ.
 - **Sem telemetria e sem conta.** A única rede usada é: a consulta UDP ao servidor que você configurar (e o DNS dele)
-  e a checagem de atualização, que a cada 2 horas consulta o `github.com/testesdokvdev/dayz-toolkit` (o feed de
+  e a checagem de atualização, que a cada 2 horas consulta o `github.com/testesdokvdev/dz-toolkit` (o feed de
   Releases, a página da última Release e o arquivo `latest.yml` dela; nada de API com login) só para saber a versão
   publicada. A aba Mapa só acessa a rede quando você
   a abre, e carrega apenas o site do mapa escolhido, o iZurvive ou o Nasdara Map (qualquer outro link abre no
@@ -30,6 +30,8 @@ Código aberto sob a licença [MIT](LICENSE).
   ele baixa o instalador da Release (conferindo o hash SHA-512 do `latest.yml`), fecha, instala em silêncio e
   abre de novo. Nunca baixa nem reinicia por conta própria. Sem internet, com o GitHub fora ou se o download falhar,
   o app segue funcionando: mostra o motivo, deixa tentar de novo ou baixar o instalador na página da Release.
+  O repositório se chamava `dayz-toolkit`: instalações antigas ainda consultam esse endereço, que o GitHub redireciona
+  para `dz-toolkit`.
 - **Os mapas são sites de terceiros e seguem as práticas deles.** Cada um roda com sessão própria (cookies e armazenamento
   separados do resto do app e do outro mapa), e o app nega todos os pedidos de permissão deles (câmera, microfone, localização, captura de tela). O
   iZurvive exibe anúncios e carrega rastreadores de publicidade. O Nasdara Map não tem conta, anúncio nem cookie de
@@ -77,7 +79,7 @@ npm run icon       # regenera src/assets/icon.png
    grátis em `VT_API_KEY`, ele envia o instalador e gera o selo para o site em `dist/virustotal.html`. Também dá para
    rodar à parte com `npm run virustotal`. Confira o resultado antes de publicar.
 5. Dê o `git push` dos commits (a tag da Release nasce do que já está no GitHub) e rode `npm run release` (usa o
-   login do `gh`). Ele pede confirmação e publica a Release em `testesdokvdev/dayz-toolkit` (o repositório de
+   login do `gh`). Ele pede confirmação e publica a Release em `testesdokvdev/dz-toolkit` (o repositório de
    `build.publish`, no `package.json`) com **uma chamada só** do `gh`: instalador, `.blockmap`, `latest.yml` e
    `SHA256SUMS.txt` (os nomes são `DZ-Toolkit-Setup-X.Y.Z.exe`, iguais aos do `latest.yml`). É isso que os apps
    instalados leem para se atualizar sozinhos: não há mais Drive nem site a atualizar a cada versão. Os assets
