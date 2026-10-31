@@ -1,5 +1,5 @@
 'use strict';
-// Aviso flutuante no canto superior direito, sem roubar o foco do DayZ.
+// Aviso flutuante no canto superior direito, sem roubar o foco do DZ.
 
 const { BrowserWindow, screen } = require('electron');
 const path = require('path');

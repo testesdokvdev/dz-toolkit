@@ -51,7 +51,7 @@ contextBridge.exposeInMainWorld('mapView', {
   openExternal: () => ipcRenderer.send('map:external'),
 });
 
-// Radio dos bunkers: audio do DayZ vindo do processo principal, em blocos
+// Radio dos bunkers: audio do DZ vindo do processo principal, em blocos
 contextBridge.exposeInMainWorld('radioAudio', {
   start: () => ipcRenderer.invoke('radio:start'),
   stop: () => ipcRenderer.invoke('radio:stop'),

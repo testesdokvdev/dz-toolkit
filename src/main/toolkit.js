@@ -13,7 +13,7 @@ const { RestartWatcher } = require('./restart');
 // Atalho no formato do Electron: modificadores opcionais + uma tecla (ex.: "F7", "Control+Shift+F6")
 const ACCELERATOR_RE =
   /^(?:(?:Control|Alt|Shift)\+){0,3}(?:[A-Z0-9]|F(?:[1-9]|1\d|2[0-4])|num[0-9]|numadd|numsub|nummult|numdec|Up|Down|Left|Right|Space|Tab|Backspace|Delete|Insert|Home|End|PageUp|PageDown)$/;
-// Teclas simples (letras, numeros, setas, Espaco, Tab) costumam ter funcao no DayZ. F5-F12, o teclado
+// Teclas simples (letras, numeros, setas, Espaco, Tab) costumam ter funcao no DZ. F5-F12, o teclado
 // numerico e combinacoes com Ctrl ou Alt em geral ficam livres.
 const isRiskyKey = (accelerator) => {
   const parts = accelerator.split('+');
@@ -64,7 +64,7 @@ class Toolkit extends EventEmitter {
       ping: null,
       queryPort: null,
       updatedAt: null,
-      client: null, // { version, relation } do DayZ instalado no PC; relation: same | client-old | server-old
+      client: null, // { version, relation } do DZ instalado no PC; relation: same | client-old | server-old
       run: 0,
     };
 
@@ -97,8 +97,8 @@ class Toolkit extends EventEmitter {
 
   /**
    * Acompanha a janela do jogo: quando ela fecha, solta o alvo; enquanto nao ha
-   * alvo, procura o DayZ a cada 2 s (pega sozinho quando o jogo abre ou reabre).
-   * Tambem atualiza a interface quando o DayZ ganha/perde o foco.
+   * alvo, procura o DZ a cada 2 s (pega sozinho quando o jogo abre ou reabre).
+   * Tambem atualiza a interface quando o DZ ganha/perde o foco.
    */
   _watchTarget() {
     if (this.target && !win32.isWindow(this.target.hwnd)) {
@@ -182,8 +182,8 @@ class Toolkit extends EventEmitter {
   }
 
   /**
-   * Seleciona a janela do DayZ sozinho se ainda nao houver alvo valido.
-   * Procura o executavel do jogo (nao o launcher, que tambem comeca com "DayZ").
+   * Seleciona a janela do DZ sozinho se ainda nao houver alvo valido.
+   * Procura o executavel do jogo (nao o launcher, que tambem comeca com "DZ").
    */
   autoSelectTarget() {
     if (this.target && win32.isWindow(this.target.hwnd)) return this.target;
@@ -213,9 +213,9 @@ class Toolkit extends EventEmitter {
   //
   // Sao atalhos globais do Windows (RegisterHotKey), a forma indicada para isso:
   // o app nao escuta o teclado, so e avisado das teclas escolhidas. Ficam
-  // registrados apenas com o DayZ em foco e a chave da ferramenta ligada; nesse
+  // registrados apenas com o DZ em foco e a chave da ferramenta ligada; nesse
   // periodo a tecla escolhida NAO chega ao jogo. Com a ferramenta desligada, ela
-  // e toda do jogo. Por isso o usuario deve escolher teclas que o DayZ nao usa.
+  // e toda do jogo. Por isso o usuario deve escolher teclas que o DZ nao usa.
   // ------------------------------------------------------------------
 
   _syncShortcuts() {
@@ -301,14 +301,14 @@ class Toolkit extends EventEmitter {
   }
 
   _hotkeyPressed(feature) {
-    // Atalhos so valem com o DayZ em foco (evita disparar digitando em outro lugar)
+    // Atalhos so valem com o DZ em foco (evita disparar digitando em outro lugar)
     if (!this.targetFocused()) return;
     if (feature === 'autorun' && this.autorun.armed) this.setAutorunActive(!this.autorun.active);
     else if (feature === 'clicker' && this.clicker.armed) this.setClickerActive(!this.clicker.active);
   }
 
   // ------------------------------------------------------------------
-  // Auto Run: segura Shift+W enquanto ativo e o DayZ em foco
+  // Auto Run: segura Shift+W enquanto ativo e o DZ em foco
   // ------------------------------------------------------------------
 
   setAutorunArmed(armed) {

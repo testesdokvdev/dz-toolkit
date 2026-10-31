@@ -1,5 +1,5 @@
 'use strict';
-// Versao do DayZ instalado no PC (lida do DayZ_x64.exe na biblioteca do Steam), para comparar com a do servidor.
+// Versao do DZ instalado no PC (lida do DayZ_x64.exe na biblioteca do Steam), para comparar com a do servidor.
 
 const fs = require('fs');
 const path = require('path');
@@ -75,7 +75,7 @@ function compareVersions(client, server) {
 
 let exePath;
 
-/** Versao do DayZ do usuario ("1.30.164200") ou null. O caminho e achado uma vez; a versao e relida sempre (o jogo atualiza). */
+/** Versao do DZ do usuario ("1.30.164200") ou null. O caminho e achado uma vez; a versao e relida sempre (o jogo atualiza). */
 async function clientVersion() {
   if (exePath === undefined || (exePath && !fs.existsSync(exePath))) exePath = await findGameExe();
   const parts = exePath && win32.fileVersion(exePath);

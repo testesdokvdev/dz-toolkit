@@ -21,7 +21,7 @@ Var pid
   !define MUI_FINISHPAGE_NOAUTOCLOSE
   !define MUI_UNFINISHPAGE_NOAUTOCLOSE
   !define MUI_WELCOMEPAGE_TITLE "Instalar o DZ Toolkit"
-  !define MUI_WELCOMEPAGE_TEXT "Este assistente vai instalar o DZ Toolkit no seu computador.$\r$\n$\r$\nO que o app faz: Auto Run, Cliques Automáticos e Monitor de Servidor para o DayZ.$\r$\n$\r$\nO que a instalação faz: copia os arquivos do app para a pasta que você escolher e cria um atalho no Menu Iniciar e na Área de Trabalho. Não pede administrador e não altera nada fora disso.$\r$\n$\r$\nO app não grava o que você digita, não mexe na memória do jogo e não tem telemetria. O código é aberto (licença MIT).$\r$\n$\r$\nClique em Avançar para continuar."
+  !define MUI_WELCOMEPAGE_TEXT "Este assistente vai instalar o DZ Toolkit no seu computador.$\r$\n$\r$\nO que o app faz: Auto Run, Cliques Automáticos e Monitor de Servidor para o DZ.$\r$\n$\r$\nO que a instalação faz: copia os arquivos do app para a pasta que você escolher e cria um atalho no Menu Iniciar e na Área de Trabalho. Não pede administrador e não altera nada fora disso.$\r$\n$\r$\nO app não grava o que você digita, não mexe na memória do jogo e não tem telemetria. O código é aberto (licença MIT).$\r$\n$\r$\nClique em Avançar para continuar."
   !insertmacro MUI_PAGE_WELCOME
 !macroend
 

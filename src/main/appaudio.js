@@ -1,5 +1,5 @@
 'use strict';
-// Captura o som de UM programa (o DayZ), sem pegar o resto do PC: "process loopback" do WASAPI, a mesma captura
+// Captura o som de UM programa (o DZ), sem pegar o resto do PC: "process loopback" do WASAPI, a mesma captura
 // por processo que o Chrome usa para "compartilhar o audio da janela". Chamada direto pelo koffi, sem programa
 // auxiliar. Pede Windows 10 (2004) ou mais novo; se o Windows recusar, start() devolve { ok: false } e quem chamou
 // decide o que fazer. As amostras saem em mono, Float32, 48 kHz, em blocos de ~100 ms.

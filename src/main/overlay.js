@@ -1,9 +1,9 @@
 'use strict';
 // Relogio do jogo na tela: janela transparente, sempre no topo, que nao pega clique nem foco
-// (o DayZ continua recebendo o teclado e o mouse). Fica no canto escolhido, em cima do jogo.
+// (o DZ continua recebendo o teclado e o mouse). Fica no canto escolhido, em cima do jogo.
 //
-// Aparece quando o DayZ esta em foco. Fora do jogo, so aparece como pre-visualizacao enquanto o Toolkit esta em foco
-// na aba "Relogio na tela" (para dar para ajustar a posicao sem abrir o jogo). So funciona com o DayZ em janela ou
+// Aparece quando o DZ esta em foco. Fora do jogo, so aparece como pre-visualizacao enquanto o Toolkit esta em foco
+// na aba "Relogio na tela" (para dar para ajustar a posicao sem abrir o jogo). So funciona com o DZ em janela ou
 // janela sem bordas.
 
 const { BrowserWindow, screen } = require('electron');
@@ -38,7 +38,7 @@ class Overlay {
     this.sync();
   }
 
-  /** Pre-visualizacao fora do jogo: so com o Toolkit em foco E na aba do relogio (nas outras abas o relogio so aparece no DayZ) */
+  /** Pre-visualizacao fora do jogo: so com o Toolkit em foco E na aba do relogio (nas outras abas o relogio so aparece no DZ) */
   get preview() {
     return this.focused && this.page === 'overlay';
   }

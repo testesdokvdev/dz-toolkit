@@ -1,6 +1,6 @@
 # DZ Toolkit
 
-Ferramentas para DayZ em um app só: **Auto Run**, **Cliques Automáticos** e **Monitor de Servidor**.
+Ferramentas para DZ em um app só: **Auto Run**, **Cliques Automáticos** e **Monitor de Servidor**.
 Feito em Electron; teclado, mouse e janelas usam a API do Windows direto (via `koffi`).
 Código aberto sob a licença [MIT](LICENSE).
 
@@ -8,18 +8,18 @@ Código aberto sob a licença [MIT](LICENSE).
 
 | Ferramenta | O que faz |
 |---|---|
-| Auto Run | Segura Shift + W enquanto ativo e o DayZ estiver em foco |
-| Cliques Automáticos | Segura o botão direito do mouse e dá cerca de 5 cliques por segundo com o esquerdo, só com o DayZ em foco. É exatamente isso e mais nada: não mira, não detecta nada na tela e não lê o jogo |
+| Auto Run | Segura Shift + W enquanto ativo e o DZ estiver em foco |
+| Cliques Automáticos | Segura o botão direito do mouse e dá cerca de 5 cliques por segundo com o esquerdo, só com o DZ em foco. É exatamente isso e mais nada: não mira, não detecta nada na tela e não lê o jogo |
 | Monitor de Servidor | Quando o servidor cai, você não precisa ficar atualizando o DayZ Launcher: o app consulta o servidor (Steam A2S, UDP) e avisa com som e alerta na tela quando ele voltar. O "Status ao vivo" mostra a hora do jogo, a fila, os jogadores, o ping e se a versão do seu jogo bate com a do servidor |
-| Relógio na tela | Mostra a hora do jogo, exatamente como o servidor informa, num canto da tela, por cima do DayZ em janela ou janela sem bordas. Não pega clique nem foco |
-| Rádio Nasdara | Só para o mapa Nasdara (Badlands): escuta só o som do DayZ, decodifica o morse do rádio dos bunkers (80.0 MHz, de noite) e mostra a grade do mapa e o código da porta de cada bunker. Mostra ao vivo os bipes que está ouvindo e os dígitos que decifrou, avisa na tela quando um bunker é confirmado e abre a posição dele no iZurvive com um clique (sempre o iZurvive, que é de onde vêm as coordenadas, mesmo que a aba Mapa esteja no Nasdara Map) |
+| Relógio na tela | Mostra a hora do jogo, exatamente como o servidor informa, num canto da tela, por cima do DZ em janela ou janela sem bordas. Não pega clique nem foco |
+| Rádio Nasdara | Só para o mapa Nasdara (Badlands): escuta só o som do DZ, decodifica o morse do rádio dos bunkers (80.0 MHz, de noite) e mostra a grade do mapa e o código da porta de cada bunker. Mostra ao vivo os bipes que está ouvindo e os dígitos que decifrou, avisa na tela quando um bunker é confirmado e abre a posição dele no iZurvive com um clique (sempre o iZurvive, que é de onde vêm as coordenadas, mesmo que a aba Mapa esteja no Nasdara Map) |
 | Mapa | Mapas interativos dentro do app, com as marcações do próprio mapa: [iZurvive](https://www.izurvive.com/) ou [Nasdara Map](https://nasdaramap.com/), à sua escolha (um seletor na própria aba; a escolha fica salva) |
 
 - **Não grava o que você digita.** Os atalhos são atalhos globais do Windows (`RegisterHotKey`): o app só é avisado
-  das teclas que você escolheu, e só os registra com o DayZ em foco e a chave da ferramenta ligada. Não existe hook
+  das teclas que você escolheu, e só os registra com o DZ em foco e a chave da ferramenta ligada. Não existe hook
   de teclado nem de mouse e nada é registrado ou guardado.
 - **Não lê nem mexe na memória do jogo e não injeta código.** Só envia teclas e cliques como se fossem seus
-  (`SendInput`) e lista as janelas abertas para achar a do DayZ.
+  (`SendInput`) e lista as janelas abertas para achar a do DZ.
 - **Sem telemetria e sem conta.** A única rede usada é: a consulta UDP ao servidor que você configurar (e o DNS dele)
   e a checagem de atualização, que a cada 2 horas consulta o `github.com/testesdokvdev/dayz-toolkit` (o feed de
   Releases, a página da última Release e o arquivo `latest.yml` dela; nada de API com login) só para saber a versão
@@ -37,11 +37,11 @@ Código aberto sob a licença [MIT](LICENSE).
   usar os grupos opcionais, guarda as marcações compartilhadas num servidor dele (ver a
   [política de privacidade](https://nasdaramap.com/privacy)). Cada mapa só é carregado quando você o escolhe na aba; depois
   disso ele fica aberto, escondido, até você fechar o app.
-- **O Rádio Nasdara só escuta, localmente, e só o DayZ.** Enquanto você está escutando, ele captura o som do
+- **O Rádio Nasdara só escuta, localmente, e só o DZ.** Enquanto você está escutando, ele captura o som do
   processo do jogo (captura de áudio por processo do Windows 10/11, `ActivateAudioInterfaceAsync`), procura os
   bipes do morse e descarta o resto na hora. Nada do áudio é gravado nem enviado. Se o Windows não deixar isolar
   o jogo, o app avisa e cai para o som do PC todo (também só durante a escuta).
-- **Escolha teclas que o DayZ não usa.** Enquanto a chave da ferramenta está ligada, a tecla do atalho é do app e
+- **Escolha teclas que o DZ não usa.** Enquanto a chave da ferramenta está ligada, a tecla do atalho é do app e
   **o jogo não a recebe** (o C, por exemplo, deixaria de agachar). Com a chave desligada, a tecla volta toda para o
   jogo. Por isso o padrão é F7 (Auto Run) e F8 (Cliques Automáticos); prefira F5 a F12 ou uma combinação com Ctrl
   ou Alt. O app avisa quando a tecla escolhida costuma ser usada pelo jogo. Duas ferramentas não podem usar a mesma
@@ -108,7 +108,7 @@ automática, pelo GitHub. Quando não houver mais ninguém nas versões antigas,
 O app se chamava DayZ Toolkit e agora é **DZ Toolkit** (só o nome do produto; o `appId` continua o mesmo, por isso o
 Windows trata o instalador novo como atualização do antigo e atualiza o item em Configurações > Aplicativos em vez de criar
 outro). Testado com instaladores de teste de mesmo `appId`: a instalação nova cai na **mesma pasta** da antiga (que mantém o
-nome antigo, ex.: `%LOCALAPPDATA%ProgramsDayZ ToolkitDZ Toolkit.exe`), o `DayZ Toolkit.exe` e o desinstalador antigo somem, os
+nome antigo, ex.: `%LOCALAPPDATA%\Programs\DayZ Toolkit\DZ Toolkit.exe`), o `DayZ Toolkit.exe` e o desinstalador antigo somem, os
 atalhos do Menu Iniciar e da Área de Trabalho são trocados pelos novos e o app aberto é fechado. **Atenção:** um ícone fixado na
 barra de tarefas, ou um atalho feito à mão que aponte para o `DayZ Toolkit.exe`, deixa de funcionar (o executável mudou de nome)
 e precisa ser fixado de novo. A pasta de dados do Electron vem do nome do produto, então sem cuidado ela mudaria e quem já usa
@@ -171,8 +171,8 @@ src/main/      processo principal
   toast.js       aviso flutuante no canto da tela
   overlay.js     relógio do jogo na tela
   mapview.js     mapas (iZurvive e Nasdara Map) presos à janela principal
-  appaudio.js    captura o som de um programa só (o DayZ), via WASAPI por processo
-  gameversion.js versão do DayZ instalado (para comparar com a do servidor)
+  appaudio.js    captura o som de um programa só (o DZ), via WASAPI por processo
+  gameversion.js versão do DZ instalado (para comparar com a do servidor)
 src/shared/      lógica compartilhada: ciclo dia/noite, decodificador de morse do rádio, bunkers da Nasdara
 src/preload.js   ponte segura com a interface
 src/renderer/    interface (HTML/CSS/JS)

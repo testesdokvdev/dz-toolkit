@@ -2,7 +2,7 @@
   "name": "dayz-toolkit",
   "productName": "DZ Toolkit",
   "version": "2.6.0",
-  "description": "Auto Run, Cliques Automáticos e Monitor de Servidor para DayZ",
+  "description": "Auto Run, Cliques Automáticos e Monitor de Servidor para DZ",
   "author": "Kevin Morente",
   "license": "MIT",
   "main": "src/main/main.js",

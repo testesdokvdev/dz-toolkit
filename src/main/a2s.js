@@ -1,5 +1,5 @@
 'use strict';
-// Consulta Steam A2S_INFO (UDP) para saber se um servidor de DayZ esta de pe.
+// Consulta Steam A2S_INFO (UDP) para saber se um servidor de DZ esta de pe.
 
 const dgram = require('dgram');
 
@@ -27,7 +27,7 @@ function readString(buf, pos) {
 }
 
 /**
- * As "keywords" do DayZ trazem, entre outras tags, a hora do jogo no servidor (HH:MM, sempre a ultima)
+ * As "keywords" do DZ trazem, entre outras tags, a hora do jogo no servidor (HH:MM, sempre a ultima)
  * e a fila de login (lqsN). A hora e repassada como o servidor informa, sem calcular nada em cima dela.
  */
 function parseKeywords(text) {

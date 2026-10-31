@@ -2,7 +2,7 @@
 // Decodificador do radio dos bunkers da Nasdara: som do jogo entra, grade do bunker + codigo da porta saem.
 // Nao depende de Node nem do navegador (a pagina entrega as amostras de audio), por isso da para testar com som sintetico.
 //
-// O que o jogo transmite (missao "Bunker broadcast" do DayZ 1.30, no radio em 80.0 MHz, de noite): para cada bunker
+// O que o jogo transmite (missao "Bunker broadcast" do DZ 1.30, no radio em 80.0 MHz, de noite): para cada bunker
 // aberto, a grade do mapa (6 digitos: 3 de leste e 3 contados a partir da borda norte, quadrados de 100 m) e depois o
 // codigo da porta (4 digitos), em morse. So existem digitos e cada digito tem exatamente 5 elementos (ponto ou traco);
 // cada elemento e um bipe de ~987 Hz, o ponto com ~0,1 s e o traco com ~0,5 s. Um tom longo mais grave (~932 Hz) pode

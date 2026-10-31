@@ -90,7 +90,7 @@ const MOUSE = {
   rightUp: 0x0010,
 };
 
-// Scan codes (set 1): o DayZ le o teclado por scan code, nao por virtual key
+// Scan codes (set 1): o DZ le o teclado por scan code, nao por virtual key
 const SCAN = { shift: 0x2a, w: 0x11 };
 
 function windowText(hwnd) {

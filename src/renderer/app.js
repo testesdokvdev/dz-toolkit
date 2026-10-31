@@ -350,7 +350,7 @@ function render() {
   renderHotkeys();
   renderToggleTool('autorun');
   renderToggleTool('clicker');
-  radioFollowGame(false); // a escuta do rádio acompanha o DayZ que o app achou
+  radioFollowGame(false); // a escuta do rádio acompanha o DZ que o app achou
   renderServer();
   renderLive();
   renderOverlay();

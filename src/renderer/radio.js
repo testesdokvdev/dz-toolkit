@@ -1,13 +1,13 @@
 'use strict';
-// Rádio dos bunkers da Nasdara: escuta só o som do DayZ (captura por processo, feita no processo principal), decodifica o morse do rádio
+// Rádio dos bunkers da Nasdara: escuta só o som do DZ (captura por processo, feita no processo principal), decodifica o morse do rádio
 // e mostra a grade e o código de cada bunker. A decodificação fica em ../shared/morse.js; aqui só tem a ligação
 // com o áudio e a tela. Carrega antes de app.js, que chama initRadio(); $, setHero, setNav e setButton vêm de app.js,
 // t de i18n.js.
 
 const radio = {
-  active: false, // escutando (ou esperando o DayZ abrir)
-  mode: null, // 'game' = so o som do DayZ (processo principal) | 'system' = som do PC todo (so se o Windows nao deixar isolar)
-  pid: null, // processo do DayZ que esta sendo escutado
+  active: false, // escutando (ou esperando o DZ abrir)
+  mode: null, // 'game' = so o som do DZ (processo principal) | 'system' = som do PC todo (so se o Windows nao deixar isolar)
+  pid: null, // processo do DZ que esta sendo escutado
   attach: 0, // conta as trocas de processo, para ignorar respostas atrasadas
   ctx: null, stream: null, source: null, proc: null, sink: null, // so no modo 'system'
   detector: null, decoder: null, timer: 0,
@@ -73,7 +73,7 @@ function radioStop() {
   renderRadio();
 }
 
-/** Som do PC todo, so quando o Windows nao deixa isolar o DayZ: o processo principal entrega o loopback do sistema */
+/** Som do PC todo, so quando o Windows nao deixa isolar o DZ: o processo principal entrega o loopback do sistema */
 async function radioStartSystem(attach) {
   try {
     const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
@@ -105,7 +105,7 @@ async function radioStartSystem(attach) {
 }
 
 /**
- * Liga a captura ao DayZ que o app acompanha (a janela alvo): ao abrir o jogo, fechar e reabrir ela troca de processo
+ * Liga a captura ao DZ que o app acompanha (a janela alvo): ao abrir o jogo, fechar e reabrir ela troca de processo
  * sozinha. Sem jogo aberto fica esperando. force = refazer mesmo com o mesmo processo (primeira ligacao).
  */
 async function radioFollowGame(force) {

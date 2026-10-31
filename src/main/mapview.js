@@ -1,5 +1,5 @@
 'use strict';
-// Mapa do DayZ dentro do app: uma pagina web presa a janela principal, posicionada em cima da area reservada
+// Mapa do DZ dentro do app: uma pagina web presa a janela principal, posicionada em cima da area reservada
 // pela interface. Ha dois mapas para escolher, o iZurvive e o Nasdara Map. Sao sites de terceiros: so o do mapa
 // escolhido carrega aqui (e so quando a aba abre), qualquer outro link abre no navegador. As marcacoes feitas
 // em cada mapa ficam no armazenamento do proprio site, numa sessao propria e persistente (partition) que

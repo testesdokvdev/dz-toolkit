@@ -135,7 +135,7 @@ if (!app.requestSingleInstanceLock()) {
       if (Number.isFinite(x) && Number.isFinite(z)) mapView?.goTo(x, z);
     });
     ipcMain.on('map:external', () => mapView?.openExternal());
-    // Radio dos bunkers: o som vem so do DayZ (pelo processo da janela que o app ja acompanha), nao do PC todo
+    // Radio dos bunkers: o som vem so do DZ (pelo processo da janela que o app ja acompanha), nao do PC todo
     ipcMain.handle('radio:start', () => {
       const pid = toolkit.target?.pid;
       return pid ? gameAudio.start(pid) : { ok: false, error: 'nogame' };
