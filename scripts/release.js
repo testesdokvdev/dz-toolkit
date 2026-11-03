@@ -6,6 +6,8 @@
 // VIRUSTOTAL: depois de publicar, todo release passa por um scan OBRIGATORIO (consulta o hash; so envia se for novo),
 // imprime o resultado e grava dist/virustotal.json para atualizar o selo do site. Com falha, expiracao ou deteccao o script
 // sai com erro e o selo do site NAO pode ser atualizado com "Limpo". Exige VT_API_KEY (conferida antes de publicar).
+// Em qualquer status avisa o agente do site (maestri ask "Criador de Sites", ou SITE_AGENT_NAME) sem esperar por ele; se o
+// aviso falhar, so imprime o comando manual: a Release ja saiu e o codigo de saida do release nao muda.
 //
 // Fluxo: confere o login -> confere que a versao ainda nao foi publicada -> gera o instalador -> confere o
 // latest.yml (versao, nome, tamanho e hash batem com o instalador) -> calcula o SHA256 -> pede confirmacao ->
@@ -21,7 +23,7 @@
 //
 //   npm run release              build + confirmacao + publicacao
 //   npm run release -- --dry-run build + conferencias + SHA256, sem publicar
-const { spawnSync } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
@@ -138,9 +140,64 @@ function writeVtFailure(sha, message) {
   );
 }
 
+// Aviso ao agente do site (Maestri). Disparo: o agente trabalha depois, o release nao espera por ele.
+const siteAgent = process.env.SITE_AGENT_NAME || 'Criador de Sites';
+const siteDir = 'D:/workspace/dayz-toolkit-site';
+const vtJsonPath = path.join(dist, 'virustotal.json').replace(/\\/g, '/'); // barras normais: a mensagem nao leva barra invertida
+const NOTIFY_WINDOW_MS = 8000; // se o maestri nao falhou nesse tempo, o aviso foi entregue e ele so espera a resposta do agente
+
+/** Mensagem curta, so ASCII, sem aspas nem barra invertida (nada que um shell ou o Windows possa corromper) */
+function siteMessage(status, info = {}) {
+  const outcome = {
+    clean: `VirusTotal: clean, ${info.flagged ?? 0} de ${info.total ?? '?'} detectaram.`,
+    flagged: `VirusTotal: flagged, ${info.flagged ?? '?'} de ${info.total ?? '?'} detectaram.`,
+    failed: 'VirusTotal: failed, sem scan real desta versao.',
+  }[status];
+  const rule =
+    status === 'clean'
+      ? `Siga a secao Fluxo de release do AGENTS.md do site (${siteDir}).`
+      : `NAO altere o selo nem faca deploy; avise o Kevin. Depois consulte a secao Fluxo de release do AGENTS.md do site (${siteDir}).`;
+  return `Release DZ Toolkit ${tag} publicada. ${outcome} Resultado em ${vtJsonPath}. ${rule}`;
+}
+
+/** Dispara "maestri ask <agente> <msg>" e NAO espera o agente terminar. Nunca lanca e nunca muda o codigo de saida do release:
+ *  se o maestri nao existir, o agente nao existir, ou o comando falhar logo, imprime o comando exato para rodar na mao. */
+function notifySite(status, info) {
+  const message = siteMessage(status, info);
+  return new Promise((resolve) => {
+    let settled = false;
+    let timer;
+    let child;
+    const finish = (ok, how) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (ok) {
+        console.log(`\nAviso enviado ao agente do site (${siteAgent}): ${how}. Ele segue o fluxo do site por conta propria.`);
+      } else {
+        console.error(`\n${bar}\nATENCAO: NAO consegui avisar o agente do site (${how}).\nA Release e o scan estao feitos; o aviso fica manual. Rode no terminal:\n\n  maestri ask "${siteAgent}" "${message}"\n${bar}`);
+      }
+      resolve();
+    };
+    try {
+      child = spawn('maestri', ['ask', siteAgent, message], { detached: true, stdio: 'ignore', windowsHide: true });
+    } catch (error) {
+      finish(false, error.message);
+      return;
+    }
+    child.on('error', (error) => finish(false, error.code === 'ENOENT' ? 'o maestri nao esta no PATH' : error.message));
+    child.on('exit', (code) => finish(code === 0, code === 0 ? 'o maestri confirmou' : `o maestri saiu com codigo ${code}; o agente existe?`));
+    timer = setTimeout(() => {
+      child.unref();
+      finish(true, 'disparado; o maestri segue esperando a resposta do agente em segundo plano');
+    }, NOTIFY_WINDOW_MS);
+  });
+}
+
 /** Passo OBRIGATORIO depois de publicar: o instalador (mesmo hash do alias) tem de estar no VirusTotal, com o resultado
- *  impresso e gravado em dist/virustotal.json para atualizar o selo do site. So envia se o hash ainda nao existir. Sai com
- *  erro se o scan falhar, expirar ou houver deteccao: nesse caso o selo do site NAO pode dizer "Limpo". */
+ *  impresso e gravado em dist/virustotal.json para atualizar o selo do site. So envia se o hash ainda nao existir. Em QUALQUER
+ *  status (clean, flagged ou failed) avisa o agente do site; sai com erro se o scan falhar, expirar ou houver deteccao: nesse
+ *  caso o selo do site NAO pode dizer "Limpo". */
 async function virusTotalStep(installerFile, hash) {
   console.log('\nVirusTotal: consultando o hash e, se ele ainda nao existir, enviando o instalador (fica visivel para a comunidade deles)...');
   let result;
@@ -148,36 +205,22 @@ async function virusTotalStep(installerFile, hash) {
     result = await require('./virustotal').analyze(installerFile, process.env.VT_API_KEY);
   } catch (error) {
     writeVtFailure(hash, error.message);
-    console.error(`
-${bar}
-VIRUSTOTAL FALHOU: ${error.message}
-A Release ${tag} JA FOI PUBLICADA, mas NAO ha scan do VirusTotal desta versao.
-NAO atualize o selo do site com "Limpo": sem scan real, o selo deve ser REMOVIDO.
-Rode "npm run virustotal" (reaproveita o arquivo ja enviado) e so atualize o site se o resultado sair limpo.
-${bar}`);
+    console.error(`\n${bar}\nVIRUSTOTAL FALHOU: ${error.message}\nA Release ${tag} JA FOI PUBLICADA, mas NAO ha scan do VirusTotal desta versao.\nNAO atualize o selo do site com "Limpo": sem scan real, o selo deve ser REMOVIDO.\nRode "npm run virustotal" (reaproveita o arquivo ja enviado) e so atualize o site se o resultado sair limpo.\n${bar}`);
+    await notifySite('failed');
     process.exit(3);
   }
   const { labelOf } = require('./virustotal');
   const label = labelOf(result);
-  console.log(`
-${bar}
-VIRUSTOTAL: RESULTADO DO SCAN`);
-  console.log(`Versao:    ${version}
-SHA256:    ${result.sha256}
-Link:      ${result.link}`);
-  console.log(`Resultado: ${label}
-Data scan: ${result.scanDate ?? 'desconhecida'}
-JSON:      dist/virustotal.json (handoff para o site)`);
+  console.log(`\n${bar}\nVIRUSTOTAL: RESULTADO DO SCAN`);
+  console.log(`Versao:    ${version}\nSHA256:    ${result.sha256}\nLink:      ${result.link}`);
+  console.log(`Resultado: ${label}\nData scan: ${result.scanDate ?? 'desconhecida'}\nJSON:      dist/virustotal.json (handoff para o site)`);
   if (result.flagged > 0) {
-    console.error(`
-ATENCAO: ${result.flagged} detecao(oes) (malicious+suspicious). NAO atualize o selo do site com "Limpo".
-Investigue o relatorio acima antes de qualquer divulgacao; o JSON esta com status "flagged".
-${bar}`);
+    console.error(`\nATENCAO: ${result.flagged} detecao(oes) (malicious+suspicious). NAO atualize o selo do site com "Limpo".\nInvestigue o relatorio acima antes de qualquer divulgacao; o JSON esta com status "flagged".\n${bar}`);
+    await notifySite('flagged', result);
     process.exit(2);
   }
-  console.log(`
->>> PROXIMO PASSO OBRIGATORIO: atualizar o selo do site (Criador de Sites) com estes numeros reais: ${label} (versao ${version}).
-${bar}`);
+  console.log(`\n>>> PROXIMO PASSO OBRIGATORIO: atualizar o selo do site (Criador de Sites) com estes numeros reais: ${label} (versao ${version}).\n${bar}`);
+  await notifySite('clean', result);
 }
 
 async function main() {
@@ -238,6 +281,11 @@ Em seguida faria o passo OBRIGATORIO do VirusTotal (SEM executar nada agora: nen
   - consultar o hash ${hash} e so enviar o instalador se ele ainda nao existir;
   - esperar a analise (ate 15 min) e imprimir versao, SHA256, link, "Limpo: X de Y", data do scan e o aviso de atualizar o selo do site (Criador de Sites);
   - gravar dist/virustotal.json; sair com erro se o scan falhar/expirar ou houver deteccao.
+Em QUALQUER status (clean, flagged ou failed) avisaria o agente do site com o Maestri, sem esperar ele terminar, e uma falha do aviso nunca muda o codigo de saida.
+  Agente: ${siteAgent} (troque com SITE_AGENT_NAME). NADA e enviado agora. Mensagens que seriam enviadas:
+  [clean]   ${siteMessage('clean', { flagged: 0, total: '<Y>' })}
+  [flagged] ${siteMessage('flagged', { flagged: '<N>', total: '<Y>' })}
+  [failed]  ${siteMessage('failed')}
 VT_API_KEY: ${process.env.VT_API_KEY ? 'presente no ambiente' : 'AUSENTE (o release de verdade nao comecaria)'}.`);
     return;
   }

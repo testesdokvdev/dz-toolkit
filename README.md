@@ -93,9 +93,18 @@ npm run icon       # regenera src/assets/icon.png
    expirar (código de saída 3) ou houver detecção (código 2), o release sai com erro: **não atualize o selo com "Limpo"**,
    investigue. Rodar de novo à parte: `npm run virustotal` (reaproveita o arquivo já enviado). Consulta só de leitura de um hash:
    `npm run virustotal -- --lookup <sha256>`.
-7. **Atualizar o site (Criador de Sites), obrigatório e logo em seguida.** Entregue ao agente do site o `dist/virustotal.json`
-   (`status`, `version`, `sha256`, `link`, `flagged`, `total`, `label`, `scanDate`) com os **números reais**. Sem scan real
-   (`status` diferente de `clean`, ou JSON de outra versão), o selo é **removido** do site, nunca mantido nem inventado.
+7. **Avisar o site (Criador de Sites): automático.** Logo depois do bloco do VirusTotal, em **qualquer** status (`clean`,
+   `flagged` ou `failed`), o `release.js` dispara `maestri ask "Criador de Sites" "<msg>"` (nome configurável em
+   `SITE_AGENT_NAME`). A mensagem é curta e só ASCII: versão, status do scan, o caminho de `dist/virustotal.json` (com barras
+   normais) e a instrução de seguir a seção "Fluxo de release" do `AGENTS.md` do site (`D:/workspace/dayz-toolkit-site`); com
+   status diferente de `clean` ela manda **não alterar o selo nem fazer deploy** e avisar o Kevin. O release **não espera** o
+   agente terminar (só confirma que o `maestri` não falhou em ~8 s) e uma falha do aviso **nunca** muda o código de saída: se o
+   `maestri` não estiver no PATH, o agente não existir/não estiver conectado a este terminal ou o comando falhar, o script
+   imprime um bloco `NAO consegui avisar o agente do site` com o **comando exato para rodar na mão**. O agente precisa estar
+   conectado ao terminal do projeto no Maestri (`maestri list`). Por trás, o site (agente) usa os **números reais** do JSON
+   (`status`, `version`, `sha256`, `link`, `flagged`, `total`, `label`, `scanDate`); sem scan real (`status` diferente de `clean`,
+   ou JSON de outra versão) o selo é **removido**, nunca mantido nem inventado. No `--dry-run` nada é enviado: só aparecem o
+   nome do agente e as mensagens que seriam enviadas.
 8. Cópia ponte para versões 2.5.0 e anteriores: **desativada desde 03/11/2026** (o endereço antigo do site saiu do ar e elas
    não alcançam mais o Drive; veja "Versões antigas" abaixo). Não há mais nada a enviar ao Drive.
 
