@@ -85,8 +85,8 @@ npm run icon       # regenera src/assets/icon.png
    `DZ-Toolkit-Setup.exe` (veja abaixo). É isso que os apps instalados leem para se atualizar sozinhos: não há mais
    Drive nem site a atualizar a cada versão. Os assets públicos são só os `DZ-Toolkit-*`. Ao final, o script confere
    que o link do site (`/releases/latest/download/DZ-Toolkit-Setup.exe`) responde e tem o tamanho do instalador.
-6. Versões 2.5.0 e anteriores: **a cópia ponte para o Drive deixou de alcançá-las** (o endereço antigo do site saiu do ar;
-   veja "Versões antigas" abaixo). Não há mais o que enviar ao Drive a cada versão.
+6. Versões 2.5.0 e anteriores: **a cópia ponte para o Drive está desativada desde 03/11/2026** (o endereço antigo do site
+   saiu do ar e elas não alcançam mais o Drive; veja "Versões antigas" abaixo). Não há mais nada a enviar ao Drive.
 
 Boas práticas: publique poucas versões e espaçadas, não envie várias seguidas.
 
@@ -119,10 +119,12 @@ baixar o instalador atual na mão, em `https://dz-toolkit.netlify.app/download` 
 [página de Releases](https://github.com/testesdokvdev/dz-toolkit/releases/latest)); o instalador novo substitui a
 instalação antiga, sem deixar dois apps, e dali em diante a atualização é automática, pelo GitHub.
 
-**Cópia ponte (`scripts/bridge.js`).** O `npm run dist` e o `npm run release` ainda geram `dist/DayZ-Toolkit-Setup-X.Y.Z.exe`,
-cópia byte a byte (mesmo SHA256) do instalador com o nome que o regex antigo reconhecia. Hoje ela não tem para quem servir
-(nunca sobe na Release do GitHub e o `/baixar` não existe mais). Para parar de gerá-la, ponha `BRIDGE_ENABLED = false` em
-`scripts/bridge.js` (ou apague o arquivo e as chamadas no `release.js` e no script `dist` do `package.json`).
+**Cópia ponte (`scripts/bridge.js`): desativada desde 03/11/2026.** Ela gerava `dist/DayZ-Toolkit-Setup-X.Y.Z.exe`, cópia
+byte a byte (mesmo SHA256) do instalador com o nome que o regex antigo reconhecia, para ir ao Drive que o `/baixar` do
+endereço antigo apontava. Sem esse endereço ela não tinha para quem servir, então `BRIDGE_ENABLED = false`: o `npm run dist`
+e o `npm run release` não geram mais a cópia, e o release segue igual (instalador versionado, `.blockmap`, `latest.yml`,
+alias `DZ-Toolkit-Setup.exe` e `SHA256SUMS.txt`). O arquivo `scripts/bridge.js` foi mantido, só desligado; para apagar de
+vez, remova-o e as chamadas no `release.js` e no script `dist` do `package.json`.
 
 ### Nome do app, pasta de dados e instalação
 

@@ -4,16 +4,19 @@
 // byte a byte (mesmo SHA256) com o nome antigo ia so para o Drive que o /baixar (dayz-toolkit.netlify.app) apontava.
 // NAO sobe na Release do GitHub: os assets publicos sao so os DZ-Toolkit-*.
 //
-// ATENCAO: o endereco antigo do site saiu do ar e nao sera recriado (o oficial agora e dz-toolkit.netlify.app), entao as
-// versoes <= 2.5.0 nao alcancam mais o /baixar nem o Drive: esta copia ficou sem destino. Ponha BRIDGE_ENABLED = false
-// (ou apague este arquivo e as chamadas em release.js e no script "dist" do package.json).
+// DESATIVADA desde 03/11/2026 (BRIDGE_ENABLED = false): o arquivo fica so como historico e para reativar se um dia fizer
+// sentido. Nada e gerado no "npm run dist" nem no "npm run release".
+//
+// Por que: o endereco antigo do site saiu do ar e nao sera recriado (o oficial agora e dz-toolkit.netlify.app), entao as
+// versoes <= 2.5.0 nao alcancam mais o /baixar nem o Drive: esta copia ficou sem destino. Para apagar de vez, remova este
+// arquivo e as chamadas em release.js e no script "dist" do package.json.
 //
 //   node scripts/bridge.js        (roda sozinho no "npm run dist" e no "npm run release")
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const BRIDGE_ENABLED = true;
+const BRIDGE_ENABLED = false; // desativada desde 03/11/2026 (veja o aviso no topo)
 const dist = path.join(__dirname, '..', 'dist');
 
 const sha256 = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
