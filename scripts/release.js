@@ -3,6 +3,10 @@
 // (electron-updater) e oferecem a atualizacao automatica.
 // Antes: rode "npm run bump" e escreva as novidades em build/release-notes.md e build/release-notes.en.md.
 //
+// VIRUSTOTAL: depois de publicar, todo release passa por um scan OBRIGATORIO (consulta o hash; so envia se for novo),
+// imprime o resultado e grava dist/virustotal.json para atualizar o selo do site. Com falha, expiracao ou deteccao o script
+// sai com erro e o selo do site NAO pode ser atualizado com "Limpo". Exige VT_API_KEY (conferida antes de publicar).
+//
 // Fluxo: confere o login -> confere que a versao ainda nao foi publicada -> gera o instalador -> confere o
 // latest.yml (versao, nome, tamanho e hash batem com o instalador) -> calcula o SHA256 -> pede confirmacao ->
 // cria a Release com UMA chamada do gh: instalador + .blockmap + latest.yml (+ alias + SHA256SUMS.txt).
@@ -61,6 +65,7 @@ const ask = (question) =>
 
 const sha256 = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const sha512Base64 = (file) => crypto.createHash('sha512').update(fs.readFileSync(file)).digest('base64');
+const bar = '='.repeat(78);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** O latest.yml e o que o app le primeiro: se nao bater com o instalador, a atualizacao falha para todo mundo. Devolve o nome do instalador. */
@@ -124,28 +129,62 @@ function gitWarnings() {
   return warnings;
 }
 
-// Pergunta a cada build se roda o VirusTotal agora. Falha ou chave ausente nao interrompem o release.
-async function maybeVirusTotal(installerPath) {
-  console.log('\nO envio ao VirusTotal deixa o instalador visivel para a comunidade deles.');
-  if ((await ask('Rodar o VirusTotal agora? (s/N) ')) !== 's') {
-    console.log('VirusTotal pulado. Depois: npm run virustotal (ou envie em https://www.virustotal.com).');
-    return;
-  }
-  if (!process.env.VT_API_KEY) {
-    console.log('Falta a chave: defina VT_API_KEY (virustotal.com > perfil > API key) e rode npm run virustotal.');
-    return;
-  }
+/** Grava dist/virustotal.json com status "failed" para o handoff nao ficar com um resultado de outra versao */
+function writeVtFailure(sha, message) {
+  fs.mkdirSync(dist, { recursive: true });
+  fs.writeFileSync(
+    path.join(dist, 'virustotal.json'),
+    JSON.stringify({ status: 'failed', version, sha256: sha, error: message, generatedAt: new Date().toISOString() }, null, 2),
+  );
+}
+
+/** Passo OBRIGATORIO depois de publicar: o instalador (mesmo hash do alias) tem de estar no VirusTotal, com o resultado
+ *  impresso e gravado em dist/virustotal.json para atualizar o selo do site. So envia se o hash ainda nao existir. Sai com
+ *  erro se o scan falhar, expirar ou houver deteccao: nesse caso o selo do site NAO pode dizer "Limpo". */
+async function virusTotalStep(installerFile, hash) {
+  console.log('\nVirusTotal: consultando o hash e, se ele ainda nao existir, enviando o instalador (fica visivel para a comunidade deles)...');
+  let result;
   try {
-    const result = await require('./virustotal').analyze(installerPath, process.env.VT_API_KEY);
-    if (result.flagged > 0) console.log(`ATENCAO: ${result.flagged} antivirus detectaram. Confira o relatorio antes de publicar.`);
+    result = await require('./virustotal').analyze(installerFile, process.env.VT_API_KEY);
   } catch (error) {
-    console.log(`VirusTotal falhou: ${error.message}\nO release continua; rode npm run virustotal depois.`);
+    writeVtFailure(hash, error.message);
+    console.error(`
+${bar}
+VIRUSTOTAL FALHOU: ${error.message}
+A Release ${tag} JA FOI PUBLICADA, mas NAO ha scan do VirusTotal desta versao.
+NAO atualize o selo do site com "Limpo": sem scan real, o selo deve ser REMOVIDO.
+Rode "npm run virustotal" (reaproveita o arquivo ja enviado) e so atualize o site se o resultado sair limpo.
+${bar}`);
+    process.exit(3);
   }
+  const { labelOf } = require('./virustotal');
+  const label = labelOf(result);
+  console.log(`
+${bar}
+VIRUSTOTAL: RESULTADO DO SCAN`);
+  console.log(`Versao:    ${version}
+SHA256:    ${result.sha256}
+Link:      ${result.link}`);
+  console.log(`Resultado: ${label}
+Data scan: ${result.scanDate ?? 'desconhecida'}
+JSON:      dist/virustotal.json (handoff para o site)`);
+  if (result.flagged > 0) {
+    console.error(`
+ATENCAO: ${result.flagged} detecao(oes) (malicious+suspicious). NAO atualize o selo do site com "Limpo".
+Investigue o relatorio acima antes de qualquer divulgacao; o JSON esta com status "flagged".
+${bar}`);
+    process.exit(2);
+  }
+  console.log(`
+>>> PROXIMO PASSO OBRIGATORIO: atualizar o selo do site (Criador de Sites) com estes numeros reais: ${label} (versao ${version}).
+${bar}`);
 }
 
 async function main() {
   if (!dryRun) {
     if (run('gh', ['auth', 'status']).status !== 0) fail('Sem login valido no GitHub CLI (gh auth login).');
+    // O scan do VirusTotal e obrigatorio depois de publicar: sem a chave o release nem comeca
+    if (!process.env.VT_API_KEY) fail('Falta a chave do VirusTotal: defina VT_API_KEY (virustotal.com > perfil > API key). O scan e obrigatorio em todo release.');
     if (run('gh', ['release', 'view', tag, '--repo', repo]).status === 0) {
       fail(`A versao ${tag} ja foi publicada em ${repo}. Suba "version" (npm run bump).`);
     }
@@ -188,15 +227,18 @@ async function main() {
     fail(error.message);
   }
 
-  await maybeVirusTotal(files[0]);
-
   const notesFile = path.join(root, 'build', 'release-notes.md');
   if (!fs.existsSync(notesFile)) fail('Falta build/release-notes.md com as novidades da versao.');
   const assets = [...files, aliasFile, sums];
   const createArgs = ['release', 'create', tag, ...assets, '--repo', repo, '--title', tag, '--notes-file', notesFile];
   if (dryRun) {
     console.log(`\n--dry-run: nada foi publicado. Seria uma chamada so: gh release create ${tag} (${assets.map((f) => path.basename(f)).join(', ')}) em ${repo}.
-Depois de publicar o script conferiria o link https://github.com/${repo}/releases/latest/download/${aliasName} (tamanho = ${fs.statSync(files[0]).size} bytes).`);
+Depois de publicar o script conferiria o link https://github.com/${repo}/releases/latest/download/${aliasName} (tamanho = ${fs.statSync(files[0]).size} bytes).
+Em seguida faria o passo OBRIGATORIO do VirusTotal (SEM executar nada agora: nenhuma chamada ao VirusTotal, nem de leitura, e nenhum upload):
+  - consultar o hash ${hash} e so enviar o instalador se ele ainda nao existir;
+  - esperar a analise (ate 15 min) e imprimir versao, SHA256, link, "Limpo: X de Y", data do scan e o aviso de atualizar o selo do site (Criador de Sites);
+  - gravar dist/virustotal.json; sair com erro se o scan falhar/expirar ou houver deteccao.
+VT_API_KEY: ${process.env.VT_API_KEY ? 'presente no ambiente' : 'AUSENTE (o release de verdade nao comecaria)'}.`);
     return;
   }
   const warnings = gitWarnings();
@@ -206,6 +248,7 @@ Depois de publicar o script conferiria o link https://github.com/${repo}/release
   const publish = run('gh', createArgs, { stdio: 'inherit' });
   if (publish.status !== 0) process.exit(publish.status ?? 1);
   await checkLatestLink(fs.statSync(files[0]).size);
+  await virusTotalStep(files[0], hash);
 }
 
 main();

@@ -1,13 +1,15 @@
 'use strict';
 // Envia o instalador ao VirusTotal, espera o resultado e gera o selo para colocar no site.
 // Precisa de uma chave de API gratuita (virustotal.com > perfil > API key) na variavel VT_API_KEY.
-// Tambem e chamado pelo scripts/release.js, que pergunta se voce quer rodar apos gerar o build.
+// E chamado pelo scripts/release.js DEPOIS de publicar a Release (passo obrigatorio de todo release).
 //
 //   $env:VT_API_KEY = "sua_chave"       (PowerShell)
 //   npm run virustotal                 usa dist/DZ-Toolkit-Setup-<versao>.exe
 //   npm run virustotal -- caminho.exe  usa outro arquivo
+//   npm run virustotal -- --lookup <sha256>   SO LEITURA: consulta um hash ja conhecido, sem enviar nada nem gravar arquivos
 //
-// Gera em dist/: virustotal.json (dados), virustotal.html (selo para colar na pagina) e virustotal.md.
+// Gera em dist/: virustotal.json (dados para o site), virustotal.html (selo) e virustotal.md.
+// So consulta antes: o arquivo so e enviado se o hash ainda nao existir no VirusTotal.
 // ATENCAO: o arquivo enviado fica visivel para a comunidade do VirusTotal.
 const crypto = require('crypto');
 const fs = require('fs');
@@ -55,16 +57,35 @@ async function waitAnalysis(key, id) {
   throw new Error('O VirusTotal demorou demais. Rode de novo: o arquivo ja enviado sera reaproveitado.');
 }
 
+// Criterio unico (selo do site e release.js): total = malicious+suspicious+undetected+harmless; detectaram = malicious+suspicious
 function summarize(sha256, stats) {
   const total = stats.malicious + stats.suspicious + stats.undetected + stats.harmless;
   const flagged = stats.malicious + stats.suspicious;
   return { sha256, flagged, total, link: `https://www.virustotal.com/gui/file/${sha256}`, stats };
 }
 
+/** Texto do selo: "Limpo: 0 de 66 antivírus detectaram" ou "2 de 66 antivírus detectaram" */
+function labelOf({ flagged, total }) {
+  return flagged === 0 ? `Limpo: 0 de ${total} antivírus detectaram` : `${flagged} de ${total} antivírus detectaram`;
+}
+
+/** Consulta so leitura: devolve o relatorio se o VirusTotal ja analisou o hash, ou null (404 ou ainda sem estatisticas) */
+async function lookup(key, sha256) {
+  if (!key) throw new Error('Defina a chave: $env:VT_API_KEY = "sua_chave" (cmd: set VT_API_KEY=sua_chave).');
+  const report = await api(key, `/files/${sha256}`);
+  return report?.data.attributes.last_analysis_stats?.undetected !== undefined ? report : null;
+}
+
+/** Resultado completo de um relatorio: contas + data da ultima analise (ISO) */
+function fromReport(sha256, report) {
+  const attrs = report.data.attributes;
+  const epoch = attrs.last_analysis_date;
+  return { ...summarize(sha256, attrs.last_analysis_stats), scanDate: epoch ? new Date(epoch * 1000).toISOString() : null };
+}
+
 function badgeHtml({ flagged, total, link }) {
-  const clean = flagged === 0;
-  const color = clean ? '#1a7f37' : '#b35900';
-  const text = clean ? `Limpo: 0 de ${total} antivírus detectaram` : `${flagged} de ${total} antivírus detectaram`;
+  const color = flagged === 0 ? '#1a7f37' : '#b35900';
+  const text = labelOf({ flagged, total });
   return (
     `<a href="${link}" target="_blank" rel="noopener noreferrer" ` +
     `style="display:inline-block;padding:8px 14px;border:1px solid ${color};border-radius:8px;` +
@@ -73,45 +94,84 @@ function badgeHtml({ flagged, total, link }) {
   );
 }
 
-/** Analisa o arquivo, grava os arquivos em dist/ e devolve { sha256, flagged, total, link, stats } */
+/** Analisa o arquivo, grava os arquivos em dist/ e devolve { sha256, flagged, total, link, stats, scanDate, uploaded } */
 async function analyze(file, key) {
   if (!key) throw new Error('Defina a chave: $env:VT_API_KEY = "sua_chave" (cmd: set VT_API_KEY=sua_chave).');
   if (!fs.existsSync(file)) throw new Error(`Arquivo nao encontrado: ${file}`);
 
   const buffer = fs.readFileSync(file);
   const sha256 = crypto.createHash('sha256').update(buffer).digest('hex');
-  console.log(`Arquivo: ${path.basename(file)}\nSHA256:  ${sha256}`);
+  console.log(`Arquivo: ${path.basename(file)}
+SHA256:  ${sha256}`);
 
-  let report = await api(key, `/files/${sha256}`);
-  if (report?.data.attributes.last_analysis_stats?.undetected !== undefined) {
+  let report = await lookup(key, sha256);
+  const uploaded = !report;
+  if (report) {
     console.log('O VirusTotal ja conhece este arquivo, nada foi enviado.');
   } else {
-    console.log('Enviando (pode levar alguns minutos)...');
+    console.log('Hash ainda desconhecido: enviando (pode levar alguns minutos)...');
     await waitAnalysis(key, await upload(key, path.basename(file), buffer));
-    report = await api(key, `/files/${sha256}`);
+    report = await lookup(key, sha256);
+    if (!report) throw new Error('O VirusTotal terminou a analise mas ainda nao devolveu o relatorio. Rode de novo: o arquivo ja enviado sera reaproveitado.');
     console.log('');
   }
 
-  const result = summarize(sha256, report.data.attributes.last_analysis_stats);
+  const result = { ...fromReport(sha256, report), uploaded };
+  const data = {
+    status: result.flagged === 0 ? 'clean' : 'flagged',
+    version,
+    file: path.basename(file),
+    sha256,
+    link: result.link,
+    flagged: result.flagged,
+    total: result.total,
+    label: labelOf(result),
+    scanDate: result.scanDate,
+    uploaded,
+    stats: result.stats,
+    generatedAt: new Date().toISOString(),
+  };
   fs.mkdirSync(dist, { recursive: true });
-  fs.writeFileSync(path.join(dist, 'virustotal.json'), JSON.stringify({ version, file: path.basename(file), ...result }, null, 2));
+  fs.writeFileSync(path.join(dist, 'virustotal.json'), JSON.stringify(data, null, 2));
   fs.writeFileSync(path.join(dist, 'virustotal.html'), badgeHtml(result));
   fs.writeFileSync(
     path.join(dist, 'virustotal.md'),
-    `[VirusTotal: ${result.flagged}/${result.total} detecções (v${version})](${result.link})\n`,
+    `[VirusTotal: ${result.flagged}/${result.total} detecções (v${version})](${result.link})
+`,
   );
 
-  console.log(`Resultado: ${result.flagged} de ${result.total} detectaram.\nRelatório: ${result.link}`);
-  console.log('Gerado em dist/: virustotal.html (cole no site), virustotal.md, virustotal.json');
+  console.log(`Resultado: ${result.flagged} de ${result.total} detectaram.
+Relatório: ${result.link}`);
+  console.log('Gerado em dist/: virustotal.json (dados para o site), virustotal.html (selo), virustotal.md');
   return result;
 }
 
-module.exports = { analyze };
+module.exports = { analyze, lookup, fromReport, labelOf, summarize };
 
 if (require.main === module) {
-  const file = path.resolve(process.argv[2] || path.join(dist, `DZ-Toolkit-Setup-${version}.exe`));
-  analyze(file, process.env.VT_API_KEY).catch((error) => {
-    console.error(`Falhou: ${error.message}`);
-    process.exit(1);
-  });
+  const arg = process.argv[2];
+  if (arg === '--lookup') {
+    // So leitura: nada e enviado nem gravado
+    const sha256 = String(process.argv[3] ?? '').toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(sha256)) {
+      console.error('Uso: npm run virustotal -- --lookup <sha256 com 64 caracteres hex>');
+      process.exit(1);
+    }
+    lookup(process.env.VT_API_KEY, sha256)
+      .then((report) => {
+        if (!report) return console.log(`O VirusTotal nao conhece ${sha256}.`);
+        const r = fromReport(sha256, report);
+        console.log(JSON.stringify({ sha256, flagged: r.flagged, total: r.total, label: labelOf(r), scanDate: r.scanDate, link: r.link, stats: r.stats }, null, 2));
+      })
+      .catch((error) => {
+        console.error(`Falhou: ${error.message}`);
+        process.exit(1);
+      });
+  } else {
+    const file = path.resolve(arg || path.join(dist, `DZ-Toolkit-Setup-${version}.exe`));
+    analyze(file, process.env.VT_API_KEY).catch((error) => {
+      console.error(`Falhou: ${error.message}`);
+      process.exit(1);
+    });
+  }
 }

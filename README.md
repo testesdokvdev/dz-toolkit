@@ -75,9 +75,9 @@ npm run icon       # regenera src/assets/icon.png
    (os outros idiomas veem o texto em inglês).
 3. Rode `npm run release -- --dry-run`: gera o instalador, confere se o `latest.yml` bate com ele (versão, nome,
    tamanho e hash) e mostra o SHA256, sem publicar.
-4. Ao fim do build, o script pergunta se deve rodar o [VirusTotal](https://www.virustotal.com) agora. Com a chave
-   grátis em `VT_API_KEY`, ele envia o instalador e gera o selo para o site em `dist/virustotal.html`. Também dá para
-   rodar à parte com `npm run virustotal`. Confira o resultado antes de publicar.
+4. Defina `VT_API_KEY` (chave grátis em virustotal.com > perfil > API key) **antes** de rodar o release: o scan do
+   [VirusTotal](https://www.virustotal.com) agora é obrigatório (passo 6) e o `npm run release` nem começa sem a chave. Nunca
+   escreva a chave no repositório nem em log. No `--dry-run` nada é enviado nem consultado no VirusTotal.
 5. Dê o `git push` dos commits (a tag da Release nasce do que já está no GitHub) e rode `npm run release` (usa o
    login do `gh`). Ele pede confirmação e publica a Release em `testesdokvdev/dz-toolkit` (o repositório de
    `build.publish`, no `package.json`) com **uma chamada só** do `gh`: instalador, `.blockmap`, `latest.yml` e
@@ -85,8 +85,19 @@ npm run icon       # regenera src/assets/icon.png
    `DZ-Toolkit-Setup.exe` (veja abaixo). É isso que os apps instalados leem para se atualizar sozinhos: não há mais
    Drive nem site a atualizar a cada versão. Os assets públicos são só os `DZ-Toolkit-*`. Ao final, o script confere
    que o link do site (`/releases/latest/download/DZ-Toolkit-Setup.exe`) responde e tem o tamanho do instalador.
-6. Versões 2.5.0 e anteriores: **a cópia ponte para o Drive está desativada desde 03/11/2026** (o endereço antigo do site
-   saiu do ar e elas não alcançam mais o Drive; veja "Versões antigas" abaixo). Não há mais nada a enviar ao Drive.
+6. **VirusTotal (obrigatório, automático logo depois de publicar).** Depois do `gh release create` e da conferência do link
+   do site, o `release.js` consulta o hash do instalador (o mesmo do alias) e **só envia o arquivo se o hash ainda não existir**
+   no VirusTotal. Espera a análise (até 15 min), imprime um bloco com versão, SHA256, link, `Limpo: X de Y antivírus detectaram`
+   (X = malicious + suspicious; Y = malicious + suspicious + undetected + harmless, o mesmo critério do selo), data do scan e o
+   aviso **PRÓXIMO PASSO OBRIGATÓRIO**, e grava `dist/virustotal.json` (fora do git) para o handoff. Se o scan falhar ou
+   expirar (código de saída 3) ou houver detecção (código 2), o release sai com erro: **não atualize o selo com "Limpo"**,
+   investigue. Rodar de novo à parte: `npm run virustotal` (reaproveita o arquivo já enviado). Consulta só de leitura de um hash:
+   `npm run virustotal -- --lookup <sha256>`.
+7. **Atualizar o site (Criador de Sites), obrigatório e logo em seguida.** Entregue ao agente do site o `dist/virustotal.json`
+   (`status`, `version`, `sha256`, `link`, `flagged`, `total`, `label`, `scanDate`) com os **números reais**. Sem scan real
+   (`status` diferente de `clean`, ou JSON de outra versão), o selo é **removido** do site, nunca mantido nem inventado.
+8. Cópia ponte para versões 2.5.0 e anteriores: **desativada desde 03/11/2026** (o endereço antigo do site saiu do ar e elas
+   não alcançam mais o Drive; veja "Versões antigas" abaixo). Não há mais nada a enviar ao Drive.
 
 Boas práticas: publique poucas versões e espaçadas, não envie várias seguidas.
 
