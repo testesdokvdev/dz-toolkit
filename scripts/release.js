@@ -5,10 +5,15 @@
 //
 // Fluxo: confere o login -> confere que a versao ainda nao foi publicada -> gera o instalador -> confere o
 // latest.yml (versao, nome, tamanho e hash batem com o instalador) -> calcula o SHA256 -> pede confirmacao ->
-// cria a Release com UMA chamada do gh: instalador + .blockmap + latest.yml (+ SHA256SUMS.txt).
+// cria a Release com UMA chamada do gh: instalador + .blockmap + latest.yml (+ alias + SHA256SUMS.txt).
 // Com arquivos anexados o gh cria a Release como rascunho, envia tudo e so entao publica; por isso o app nunca
 // ve o latest.yml sem o instalador ao lado. O repositorio e o MESMO de build.publish (package.json), que o app
 // usa para procurar atualizacoes, qualquer que seja o "origin" do git.
+//
+// ALIAS: alem do instalador versionado, a Release leva DZ-Toolkit-Setup.exe, copia byte a byte (mesmo SHA256) com nome
+// FIXO. E o que o site (/download -> 302 -> /releases/latest/download/DZ-Toolkit-Setup.exe) entrega a quem baixa pela
+// primeira vez. Ele e criado DEPOIS da conferencia do latest.yml e nunca aparece nele: o atualizador so le o asset
+// versionado. Depois de publicar, o script confere que o link "latest" responde e tem o tamanho do instalador.
 //
 //   npm run release              build + confirmacao + publicacao
 //   npm run release -- --dry-run build + conferencias + SHA256, sem publicar
@@ -28,6 +33,7 @@ const pkg = require(path.join(root, 'package.json'));
 const { version } = pkg;
 const tag = `v${version}`;
 const installer = `DZ-Toolkit-Setup-${version}.exe`;
+const aliasName = 'DZ-Toolkit-Setup.exe'; // nome fixo: o link /releases/latest/download/<nome> so funciona com ele
 const feed = pkg.build.publish.find((p) => p.provider === 'github');
 const repo = `${feed.owner}/${feed.repo}`;
 // O app abre "repository"/releases/latest como plano B do download manual (a chave "build" nao vai no app empacotado)
@@ -55,6 +61,7 @@ const ask = (question) =>
 
 const sha256 = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const sha512Base64 = (file) => crypto.createHash('sha512').update(fs.readFileSync(file)).digest('base64');
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** O latest.yml e o que o app le primeiro: se nao bater com o instalador, a atualizacao falha para todo mundo. Devolve o nome do instalador. */
 function checkLatestYml(latestFile) {
@@ -70,6 +77,41 @@ function checkLatestYml(latestFile) {
   if (size && Number(size) !== fs.statSync(installerFile).size) fail('O tamanho do instalador nao bate com o latest.yml.');
   if (ymlHash !== sha512Base64(installerFile)) fail('O sha512 do instalador nao bate com o latest.yml.');
   return ymlPath;
+}
+
+/** Copia o instalador para o nome fixo e confere que ficou identica (mesmo SHA256). Devolve o caminho do alias. */
+function makeAlias(installerFile) {
+  const target = path.join(dist, aliasName);
+  fs.copyFileSync(installerFile, target);
+  if (sha256(installerFile) !== sha256(target)) fail('O alias nao ficou igual ao instalador (SHA256 diferente).');
+  return target;
+}
+
+/** Depois de publicar: o link "latest" do site tem de entregar o instalador desta versao. Pede so o 1o byte (GET com Range;
+ *  o link assinado do GitHub nao aceita HEAD) e segue os redirecionamentos. Nao muda o resultado do release: ja foi publicado. */
+async function checkLatestLink(expectedSize) {
+  const url = `https://github.com/${repo}/releases/latest/download/${aliasName}`;
+  console.log(`
+Conferindo o link do site: ${url}`);
+  let problem = '';
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    try {
+      const res = await fetch(url, { headers: { Range: 'bytes=0-0' }, redirect: 'follow' });
+      await res.body?.cancel();
+      const total = Number(/\/(\d+)$/.exec(res.headers.get('content-range') ?? '')?.[1] ?? res.headers.get('content-length'));
+      if (res.status !== 200 && res.status !== 206) problem = `respondeu HTTP ${res.status}`;
+      else if (total !== expectedSize) problem = `tamanho ${total} difere do instalador (${expectedSize}); o "latest" ainda nao e esta versao?`;
+      else {
+        console.log(`Link conferido: HTTP ${res.status}, ${total} bytes, igual ao ${installer}.`);
+        return true;
+      }
+    } catch (error) {
+      problem = error.message;
+    }
+    if (attempt < 4) await sleep(5000); // o GitHub leva alguns segundos para refletir a Release nova
+  }
+  console.log(`ATENCAO: o link do site nao confere (${problem}). A Release ja foi publicada; abra o link no navegador e confira.`);
+  return false;
 }
 
 /** Avisos (nao bloqueiam): a tag da Release nasce do que ja esta no GitHub, nao do que so esta no seu computador */
@@ -127,10 +169,13 @@ async function main() {
   const files = [installerName, `${installerName}.blockmap`, 'latest.yml'].map((f) => path.join(dist, f));
   console.log(`latest.yml conferido: ${installerName} (versao, tamanho e sha512 batem).`);
 
+  // Alias de nome fixo para o site. Criado so agora, depois da conferencia do latest.yml, que nao o conhece.
+  const aliasFile = makeAlias(files[0]);
   const hash = sha256(files[0]);
   const sums = path.join(dist, 'SHA256SUMS.txt');
-  fs.writeFileSync(sums, `${hash}  ${installerName}\n`);
+  fs.writeFileSync(sums, `${hash}  ${installerName}\n${hash}  ${aliasName}\n`);
   console.log(`\nSHA256: ${hash}`);
+  console.log(`Alias para o site: ${aliasName} (mesmo SHA256 do ${installerName}; fora do latest.yml).`);
 
   // Copia ponte (nome antigo, mesmo SHA256) para o Drive das versoes <= 2.5.0. Fica FORA da lista de assets da Release.
   try {
@@ -144,9 +189,11 @@ async function main() {
 
   const notesFile = path.join(root, 'build', 'release-notes.md');
   if (!fs.existsSync(notesFile)) fail('Falta build/release-notes.md com as novidades da versao.');
-  const createArgs = ['release', 'create', tag, ...files, sums, '--repo', repo, '--title', tag, '--notes-file', notesFile];
+  const assets = [...files, aliasFile, sums];
+  const createArgs = ['release', 'create', tag, ...assets, '--repo', repo, '--title', tag, '--notes-file', notesFile];
   if (dryRun) {
-    console.log(`\n--dry-run: nada foi publicado. Seria uma chamada so: gh release create ${tag} (${[...files, sums].map((f) => path.basename(f)).join(', ')}) em ${repo}.`);
+    console.log(`\n--dry-run: nada foi publicado. Seria uma chamada so: gh release create ${tag} (${assets.map((f) => path.basename(f)).join(', ')}) em ${repo}.
+Depois de publicar o script conferiria o link https://github.com/${repo}/releases/latest/download/${aliasName} (tamanho = ${fs.statSync(files[0]).size} bytes).`);
     return;
   }
   const warnings = gitWarnings();
@@ -154,7 +201,8 @@ async function main() {
   if ((await ask(`\nPublicar ${tag} em ${repo}? (s/N) `)) !== 's') fail('Cancelado, nada foi publicado.');
 
   const publish = run('gh', createArgs, { stdio: 'inherit' });
-  process.exit(publish.status ?? 1);
+  if (publish.status !== 0) process.exit(publish.status ?? 1);
+  await checkLatestLink(fs.statSync(files[0]).size);
 }
 
 main();

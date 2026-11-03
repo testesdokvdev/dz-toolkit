@@ -81,13 +81,32 @@ npm run icon       # regenera src/assets/icon.png
 5. Dê o `git push` dos commits (a tag da Release nasce do que já está no GitHub) e rode `npm run release` (usa o
    login do `gh`). Ele pede confirmação e publica a Release em `testesdokvdev/dz-toolkit` (o repositório de
    `build.publish`, no `package.json`) com **uma chamada só** do `gh`: instalador, `.blockmap`, `latest.yml` e
-   `SHA256SUMS.txt` (os nomes são `DZ-Toolkit-Setup-X.Y.Z.exe`, iguais aos do `latest.yml`). É isso que os apps
-   instalados leem para se atualizar sozinhos: não há mais Drive nem site a atualizar a cada versão. Os assets
-   públicos são só os `DZ-Toolkit-*`.
+   `SHA256SUMS.txt` (os nomes são `DZ-Toolkit-Setup-X.Y.Z.exe`, iguais aos do `latest.yml`) e o **alias**
+   `DZ-Toolkit-Setup.exe` (veja abaixo). É isso que os apps instalados leem para se atualizar sozinhos: não há mais
+   Drive nem site a atualizar a cada versão. Os assets públicos são só os `DZ-Toolkit-*`. Ao final, o script confere
+   que o link do site (`/releases/latest/download/DZ-Toolkit-Setup.exe`) responde e tem o tamanho do instalador.
 6. Só enquanto existirem versões 2.5.0 ou anteriores: envie ao Drive que o `/baixar` aponta a **cópia ponte**
    `dist/DayZ-Toolkit-Setup-X.Y.Z.exe` (veja abaixo). Ela não vai para a Release.
 
 Boas práticas: publique poucas versões e espaçadas, não envie várias seguidas.
+
+### Link fixo de download (alias `DZ-Toolkit-Setup.exe`)
+
+Para o site ter **um só** botão de download, independente da versão, toda Release leva, além do instalador versionado,
+o asset `DZ-Toolkit-Setup.exe`: cópia byte a byte (mesmo SHA256, o `release.js` confere) com nome fixo. Assim o link
+`https://github.com/testesdokvdev/dz-toolkit/releases/latest/download/DZ-Toolkit-Setup.exe` sempre entrega a última versão.
+O `SHA256SUMS.txt` lista os dois nomes.
+
+- **Rota do site:** no Netlify, crie `/download` com **302** (nunca 301, que o navegador guarda para sempre) para o link
+  acima, por exemplo no `_redirects`:
+  `/download  https://github.com/testesdokvdev/dz-toolkit/releases/latest/download/DZ-Toolkit-Setup.exe  302`.
+  Os botões do site apontam para `/download`. O repositório precisa ser público.
+- **O alias não é o que atualiza o app.** O `latest.yml` continua apontando só para o `DZ-Toolkit-Setup-X.Y.Z.exe`
+  (o atualizador confere o sha512 dele); o alias é criado depois dessa conferência e nunca entra no `latest.yml`.
+- **`/baixar` e o Drive não mudam** enquanto existirem versões 2.5.0 ou anteriores (próxima seção). Quando a cópia
+  ponte for desligada, o `/baixar` pode passar a redirecionar para o `/download`.
+- O instalador sem assinatura continua sujeito ao SmartScreen/antivírus a cada versão nova, com ou sem link fixo; a
+  reputação é do arquivo (hash) e do certificado, não do link.
 
 ### Versões antigas (2.5.0 e anteriores)
 
