@@ -85,8 +85,8 @@ npm run icon       # regenera src/assets/icon.png
    `DZ-Toolkit-Setup.exe` (veja abaixo). É isso que os apps instalados leem para se atualizar sozinhos: não há mais
    Drive nem site a atualizar a cada versão. Os assets públicos são só os `DZ-Toolkit-*`. Ao final, o script confere
    que o link do site (`/releases/latest/download/DZ-Toolkit-Setup.exe`) responde e tem o tamanho do instalador.
-6. Só enquanto existirem versões 2.5.0 ou anteriores: envie ao Drive que o `/baixar` aponta a **cópia ponte**
-   `dist/DayZ-Toolkit-Setup-X.Y.Z.exe` (veja abaixo). Ela não vai para a Release.
+6. Versões 2.5.0 e anteriores: **a cópia ponte para o Drive deixou de alcançá-las** (o endereço antigo do site saiu do ar;
+   veja "Versões antigas" abaixo). Não há mais o que enviar ao Drive a cada versão.
 
 Boas práticas: publique poucas versões e espaçadas, não envie várias seguidas.
 
@@ -97,32 +97,32 @@ o asset `DZ-Toolkit-Setup.exe`: cópia byte a byte (mesmo SHA256, o `release.js`
 `https://github.com/testesdokvdev/dz-toolkit/releases/latest/download/DZ-Toolkit-Setup.exe` sempre entrega a última versão.
 O `SHA256SUMS.txt` lista os dois nomes.
 
-- **Rota do site:** no Netlify, crie `/download` com **302** (nunca 301, que o navegador guarda para sempre) para o link
+- **Rota do site (`https://dz-toolkit.netlify.app/download`):** no Netlify, crie `/download` com **302** (nunca 301, que o navegador guarda para sempre) para o link
   acima, por exemplo no `_redirects`:
   `/download  https://github.com/testesdokvdev/dz-toolkit/releases/latest/download/DZ-Toolkit-Setup.exe  302`.
   Os botões do site apontam para `/download`. O repositório precisa ser público.
 - **O alias não é o que atualiza o app.** O `latest.yml` continua apontando só para o `DZ-Toolkit-Setup-X.Y.Z.exe`
   (o atualizador confere o sha512 dele); o alias é criado depois dessa conferência e nunca entra no `latest.yml`.
-- **`/baixar` e o Drive não mudam** enquanto existirem versões 2.5.0 ou anteriores (próxima seção). Quando a cópia
-  ponte for desligada, o `/baixar` pode passar a redirecionar para o `/download`.
+- **O site mudou de endereço:** o oficial agora é `https://dz-toolkit.netlify.app/` e quem vai baixar o app deve usar o
+  `/download` dele. O endereço antigo (`dayz-toolkit.netlify.app`) está fora do ar e não será recriado (próxima seção).
 - O instalador sem assinatura continua sujeito ao SmartScreen/antivírus a cada versão nova, com ou sem link fixo; a
   reputação é do arquivo (hash) e do certificado, não do link.
 
 ### Versões antigas (2.5.0 e anteriores)
 
-Elas não têm o atualizador novo: só olham a página `dayz-toolkit.netlify.app/baixar`, que redireciona (302) para um
-arquivo do Google Drive, e só reconhecem versão nova pelo **nome** desse arquivo, que tem de casar com
-`DayZ-Toolkit-Setup-X.Y.Z.exe`. O instalador novo se chama `DZ-Toolkit-Setup-X.Y.Z.exe` (nome que o regex antigo não
-reconhece), então **não aponte o `/baixar` para o asset do GitHub**: as versões antigas nunca ficariam sabendo da versão nova.
+Elas não têm o atualizador novo. Só olhavam a página `dayz-toolkit.netlify.app/baixar` (o **endereço antigo do site**), que
+redirecionava (302) para um arquivo do Google Drive, e só reconheciam versão nova pelo **nome** desse arquivo
+(`DayZ-Toolkit-Setup-X.Y.Z.exe`). Esse endereço antigo **saiu do ar (404 em tudo) e não será recriado**; o site oficial hoje é
+`https://dz-toolkit.netlify.app/`. Como esses apps têm o endereço antigo gravado no código, **não conseguem mais ver nem
+baixar versão nova**: a ponte via `/baixar` + Drive deixou de alcançá-las. Quem ainda está numa dessas versões precisa
+baixar o instalador atual na mão, em `https://dz-toolkit.netlify.app/download` (ou na
+[página de Releases](https://github.com/testesdokvdev/dz-toolkit/releases/latest)); o instalador novo substitui a
+instalação antiga, sem deixar dois apps, e dali em diante a atualização é automática, pelo GitHub.
 
-Para elas migrarem existe a **cópia ponte**: `npm run dist` e `npm run release` (inclusive com `--dry-run`) geram, além do
-instalador, `dist/DayZ-Toolkit-Setup-X.Y.Z.exe`, uma cópia byte a byte do `DZ-Toolkit-Setup-X.Y.Z.exe` (mesmo SHA256, o
-script confere). **Cópia ponte para o Drive, só enquanto existirem versões 2.5.0 ou anteriores.** Ela não sobe na Release do
-GitHub. Passo a passo: envie essa cópia ao Drive que o `/baixar` aponta (substituindo o arquivo antigo); os apps antigos
-leem a versão no nome, avisam, e o botão "Baixar nova versão" abre o `/baixar`. Cada pessoa instala essa versão na mão
-uma vez (o instalador novo substitui a instalação antiga, sem deixar dois apps); dali em diante a atualização é
-automática, pelo GitHub. Quando não houver mais ninguém nas versões antigas, ponha `BRIDGE_ENABLED = false` em
-`scripts/bridge.js` (ou apague o arquivo e as duas chamadas).
+**Cópia ponte (`scripts/bridge.js`).** O `npm run dist` e o `npm run release` ainda geram `dist/DayZ-Toolkit-Setup-X.Y.Z.exe`,
+cópia byte a byte (mesmo SHA256) do instalador com o nome que o regex antigo reconhecia. Hoje ela não tem para quem servir
+(nunca sobe na Release do GitHub e o `/baixar` não existe mais). Para parar de gerá-la, ponha `BRIDGE_ENABLED = false` em
+`scripts/bridge.js` (ou apague o arquivo e as chamadas no `release.js` e no script `dist` do `package.json`).
 
 ### Nome do app, pasta de dados e instalação
 

@@ -1,11 +1,12 @@
 'use strict';
 // COPIA PONTE para as versoes antigas (2.5.0 e anteriores). Elas so reconhecem versao nova pelo NOME do arquivo no
 // Drive (regex /DayZ-Toolkit-Setup-(\d+...).exe/), e o instalador novo se chama DZ-Toolkit-Setup-X.Y.Z.exe. Esta copia
-// byte a byte (mesmo SHA256) com o nome antigo vai so para o Drive que o /baixar aponta. NAO sobe na Release do GitHub:
-// os assets publicos sao so os DZ-Toolkit-*.
+// byte a byte (mesmo SHA256) com o nome antigo ia so para o Drive que o /baixar (dayz-toolkit.netlify.app) apontava.
+// NAO sobe na Release do GitHub: os assets publicos sao so os DZ-Toolkit-*.
 //
-// Quando nao houver mais ninguem em versao <= 2.5.0, ponha BRIDGE_ENABLED = false (ou apague este arquivo e as chamadas
-// em release.js e no script "dist" do package.json).
+// ATENCAO: o endereco antigo do site saiu do ar e nao sera recriado (o oficial agora e dz-toolkit.netlify.app), entao as
+// versoes <= 2.5.0 nao alcancam mais o /baixar nem o Drive: esta copia ficou sem destino. Ponha BRIDGE_ENABLED = false
+// (ou apague este arquivo e as chamadas em release.js e no script "dist" do package.json).
 //
 //   node scripts/bridge.js        (roda sozinho no "npm run dist" e no "npm run release")
 const crypto = require('crypto');

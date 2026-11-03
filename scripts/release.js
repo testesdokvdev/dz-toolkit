@@ -177,7 +177,8 @@ async function main() {
   console.log(`\nSHA256: ${hash}`);
   console.log(`Alias para o site: ${aliasName} (mesmo SHA256 do ${installerName}; fora do latest.yml).`);
 
-  // Copia ponte (nome antigo, mesmo SHA256) para o Drive das versoes <= 2.5.0. Fica FORA da lista de assets da Release.
+  // Copia ponte (nome antigo, mesmo SHA256) das versoes <= 2.5.0. Sem destino desde que o endereco antigo do site saiu do ar
+  // (veja scripts/bridge.js). Fica FORA da lista de assets da Release.
   try {
     const bridge = makeBridgeCopy(version);
     if (bridge) console.log(`Copia ponte para o Drive: ${path.basename(bridge.file)} (mesmo SHA256; NAO vai para a Release do GitHub).`);
